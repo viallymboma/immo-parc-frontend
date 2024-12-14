@@ -153,9 +153,9 @@ export default function UserTable() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem>View</DropdownItem>
-                <DropdownItem>Edit</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
+                <span>View</span>
+                <span>Edit</span>
+                <span>Delete</span>
               </DropdownMenu>
             </Dropdown>
           </div>

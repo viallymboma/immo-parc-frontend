@@ -162,9 +162,9 @@ export default function RechargesTable() {
                 </Button>
               </DropdownTrigger>
               <DropdownMenu>
-                <DropdownItem>View</DropdownItem>
-                <DropdownItem>Edit</DropdownItem>
-                <DropdownItem>Delete</DropdownItem>
+                <span>View</span>
+                <span>Edit</span>
+                <span>Delete</span>
               </DropdownMenu>
             </Dropdown>
           </div>

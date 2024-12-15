@@ -10,6 +10,7 @@ import axios from 'axios';
 import { cookies } from 'next/headers';
 
 import MainLayout from '@/components/common/backbone/MainLayout';
+import { BASE_API_URL } from '@/lib/constants';
 
 // import { useUserInfo } from '@/hooks/useUserInfo';
 
@@ -29,9 +30,7 @@ const RootLayout = async ({
   try {
     if (!token) throw new Error('No token found');
     // Optionally, verify token validity with a backend API call
-    // Verify token validity with a backend API call
-    // const request = await apiClient.get('http://localhost:5000/auth/me');
-    const request = await axios.get('http://localhost:5000/auth/verify-token', {
+    const request = await axios.get(`${BASE_API_URL}/auth/verify-token`, {
       headers: {
         Authorization: `Bearer ${token}`, // Send token in the Authorization header
       },

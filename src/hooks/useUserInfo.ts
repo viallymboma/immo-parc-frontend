@@ -1,6 +1,8 @@
 "use client";
 import useSWR from 'swr';
 
+import { BASE_API_URL } from '@/lib/constants';
+
 import apiClient from '../lib/apiClient';
 
 const fetcher = async (url: string) => {
@@ -30,7 +32,7 @@ export type UserResponseType = {
 
 export function useUserInfo() {
 
-    const { data: user, error, isValidating, mutate } = useSWR('http://localhost:5000/auth/me', fetcher, {
+    const { data: user, error, isValidating, mutate } = useSWR(`${BASE_API_URL}/auth/me`, fetcher, {
         // refreshInterval: 20, // Disables periodic revalidation
         refreshInterval: 0, // Disable periodic revalidation
         revalidateOnFocus: false, // Disable revalidation on window focus

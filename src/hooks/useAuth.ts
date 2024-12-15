@@ -1,10 +1,12 @@
+import { BASE_API_URL } from '@/lib/constants';
+
 import apiClient from '../lib/apiClient';
 
 export function useAuth() {
 
     const login = async (phone: string, password: string) => {
         try {
-            const response = await apiClient.post('/auth/login', { phone, password });
+            const response = await apiClient.post(`${BASE_API_URL}/auth/login`, { phone, password });
             return response.data;
         } catch (err: any) {
             throw new Error(err.response?.data?.message || 'Login failed');

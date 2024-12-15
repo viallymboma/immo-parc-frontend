@@ -5,6 +5,7 @@ import {
   TaskDataType,
   tasks,
 } from '@/components/common/backbone/other_component/data';
+import { BASE_API_URL } from '@/lib/constants';
 
 interface TaskState {
   tasks_: TaskDataType[]; // Store the list of tasks
@@ -62,7 +63,7 @@ export const useTaskStore = create<TaskState>()(
       // Fetch tasks from server
       setTasksFromServer: async () => {
         try {
-          const response = await fetch('http://localhost:5000/tasks/users-tasks'); // Replace with your API endpoint
+          const response = await fetch(`${BASE_API_URL}/tasks/users-tasks`); // Replace with your API endpoint
           if (!response.ok) {
             throw new Error('Failed to fetch tasks');
           }
@@ -86,7 +87,7 @@ export const useTaskStore = create<TaskState>()(
           if (category === "Toutes") {
             updatedSelectedTasks = state?.tasks_
           }
-          console.log(updatedSelectedTasks, "jjjjjjjjjj"); 
+          // console.log(updatedSelectedTasks, "jjjjjjjjjj"); 
           return { ...state, filteredTasks: updatedSelectedTasks, selectedCategory: category };
         }),
 

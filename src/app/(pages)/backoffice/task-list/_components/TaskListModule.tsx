@@ -8,13 +8,15 @@ import {
 import NavigationContent
   from '@/components/common/navigation/NavigationContent';
 import TaskDetailCard from '@/components/common/TaskDetailCard';
+import useFetchTaskAssigments from '@/hooks/useFetchTaskAssigment';
 import { useTaskStore } from '@/store/task-store';
 
 // import TaskList from '@/components/common/TaskList';
 
 const TaskListModule = () => {
-    const { tasks_, selectedCategory, filteredTasks, toggleCategory } = useTaskStore();
-    console.log(tasks_, "pp666pppppppppppppp")
+    const { tasks_, selectedCategory, filteredTasks, toggleCategory } = useTaskStore(); 
+    const { taskAssignment } = useFetchTaskAssigments ()
+    console.log(tasks_, "pp666pppppppppppppp", taskAssignment)
     const extractCategories = Array.from(new Set(
         tasks_?.map((prop: TaskDataType) => prop?.taskStatus)
     ));

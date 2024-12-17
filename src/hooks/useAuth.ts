@@ -6,7 +6,7 @@ export function useAuth() {
 
     const login = async (phone: string, password: string) => {
         try {
-            const response = await apiClient.post(`${BASE_API_URL}/auth/login`, { phone, password });
+            const response = await apiClient.post(`${BASE_API_URL}/auth/login`, { phone, password }, { withCredentials: true });
             return response.data;
         } catch (err: any) {
             throw new Error(err.response?.data?.message || 'Login failed');

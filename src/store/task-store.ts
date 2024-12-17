@@ -5,6 +5,7 @@ import {
   TaskDataType,
   tasks,
 } from '@/components/common/backbone/other_component/data';
+// import { useUserInfo } from '@/hooks/useUserInfo';
 import { BASE_API_URL } from '@/lib/constants';
 
 interface TaskState {
@@ -14,109 +15,131 @@ interface TaskState {
   selectedCategory?: string; // Array of selected tasks
   filteredTasks?: TaskDataType[]; // Array of selected tasks
   setTasks: (tasks_: TaskDataType[]) => void; // Load all tasks
-  toggleTaskSelection: (id: number) => void; // Add or remove a task from the selection
+  toggleTaskSelection: (id: number | string, numberOfTaskPerDay: number) => void; // Add or remove a task from the selection
   toggleCategory: (category: string) => void 
   clearTaskSelection: () => void; // Clear all selected tasks
-  selectTask: (id: number) => void; // Select a specific task by ID
+  selectTask: (id: number | string) => void; // Select a specific task by ID
   submitTask: () => void; // Mark the selected task as submitted
 }
 
 export const useTaskStore = create<TaskState>()(
   persist(
-    (set) => ({
-      tasks_: tasks, // Initialize tasks
-      filteredTasks: tasks, // Initialize filteredtasks
-      selectedTask: null, // No task selected by default
-      selectedTasks: [], // Array of selected tasks
+    (set, get) => {
+      return ({
+        tasks_: tasks, // Initialize tasks
+        filteredTasks: get()?.filteredTasks || [], // Initialize filteredtasks
+        selectedTask: null, // No task selected by default
+        selectedTasks: get()?.selectedTasks || [], // Array of selected tasks
 
-      // Load all tasks
-      setTasks: (tasks) =>
-        set({
-          tasks_: tasks.map((task) => ({
-            ...task,
-            isSelected: task.isSelected ?? false, // Default to false if not set
+        // Load all tasks
+        setTasks: (tasks) =>
+          set((state) => {
+            // Get selectedTasks from the current state if any selectedTasks from our persistant
+            const selectedTaskIds = state.selectedTasks.map((task) => task._id);
+
+            return {
+              tasks_: tasks.map((task) => ({
+                ...task,
+                isSelected: selectedTaskIds.includes(task._id) || task.isSelected || false, // Mark as selected if in selectedTasks
+              })),
+            };
+          }),
+
+        // Select a specific task by ID
+        selectTask: (id) =>
+          set((state) => ({
+            selectedTask: state.tasks_.find((task) => task._id === id) || null,
+            tasks_: state.tasks_.map((task) =>
+              task._id === id ? { ...task, isSelected: true } : { ...task, isSelected: false }
+            ),
           })),
-        }),
 
-      // Select a specific task by ID
-      selectTask: (id) =>
-        set((state) => ({
-          selectedTask: state.tasks_.find((task) => task.id === id) || null,
-          tasks_: state.tasks_.map((task) =>
-            task.id === id ? { ...task, isSelected: true } : { ...task, isSelected: false }
-          ),
-        })),
+        // Add or remove a task from the selection
+        toggleTaskSelection: (id, maxTasks) =>
+          set((state) => {
+            const taskIndex = state.tasks_.findIndex((task) => task._id === id);
+            if (taskIndex === -1) return state; // Task not found
 
-      // Add or remove a task from the selection
-      toggleTaskSelection: (id) =>
-        set((state) => {
-          const updatedTasks = state.tasks_.map((task) =>
-            task.id === id
-              ? { ...task, isSelected: !task.isSelected, taskStatus: task?.isSelected ? "Toutes" : "Sélectionnées" }
-              : task
-          );
+            const task = state.tasks_[taskIndex];
+            const isSelected = !task.isSelected;
 
-          const updatedSelectedTasks = updatedTasks.filter((task) => task.isSelected);
-          return { tasks_: updatedTasks, selectedTasks: updatedSelectedTasks };
-        }),
+            console.log(state.selectedTasks, "hellooooouuuuuuu")
 
-      // Fetch tasks from server
-      setTasksFromServer: async () => {
-        try {
-          const response = await fetch(`${BASE_API_URL}/tasks/users-tasks`); // Replace with your API endpoint
-          if (!response.ok) {
-            throw new Error('Failed to fetch tasks');
+            // Check the limit
+            if (isSelected && (state.selectedTasks.length || get().selectedTasks.length) >= maxTasks) {
+              alert(`You can only select up to ${maxTasks} tasks per day.`);
+              return state;
+            }
+
+            // Update task selection
+            const updatedTasks = state.tasks_.map((t) =>
+              t._id === id ? { ...t, isSelected } : t
+            );
+
+            const updatedSelectedTasks = isSelected
+              ? [...state.selectedTasks, { ...task, isSelected }]
+              : state.selectedTasks.filter((t) => t._id !== id);
+
+            return { tasks_: updatedTasks, selectedTasks: updatedSelectedTasks };
+          }),
+
+        // Fetch tasks from server
+        setTasksFromServer: async () => {
+          try {
+            const response = await fetch(`${BASE_API_URL}/tasks/users-tasks`); // Replace with your API endpoint
+            if (!response.ok) {
+              throw new Error('Failed to fetch tasks');
+            }
+            const tasks: TaskDataType[] = await response.json();
+            set({
+              tasks_: tasks.map((task) => ({
+                ...task,
+                isSelected: false, // Ensure a clean slate for selections
+              })),
+              filteredTasks: tasks, // Sync filtered tasks with the fetched tasks
+            });
+          } catch (error) {
+            console.error('Error fetching tasks:', error);
           }
-          const tasks: TaskDataType[] = await response.json();
-          set({
-            tasks_: tasks.map((task) => ({
-              ...task,
-              isSelected: false, // Ensure a clean slate for selections
-            })),
-            filteredTasks: tasks, // Sync filtered tasks with the fetched tasks
-          });
-        } catch (error) {
-          console.error('Error fetching tasks:', error);
-        }
-      },
+        },
 
-      // Add or remove a task from the selection
-      toggleCategory: (category: string) =>
-        set((state) => {
-          let updatedSelectedTasks = state?.tasks_?.filter((task) => task?.taskStatus === category);
-          if (category === "Toutes") {
-            updatedSelectedTasks = state?.tasks_
-          }
-          // console.log(updatedSelectedTasks, "jjjjjjjjjj"); 
-          return { ...state, filteredTasks: updatedSelectedTasks, selectedCategory: category };
-        }),
+        // Add or remove a task from the selection
+        toggleCategory: (category: string) =>
+          set((state) => {
+            let updatedSelectedTasks = state?.selectedTasks?.filter((task) => task?.taskStatus === category);
+            if (category === "Toutes") {
+              updatedSelectedTasks = state?.tasks_
+            }
+            // console.log(updatedSelectedTasks, "jjjjjjjjjj"); 
+            return { ...state, filteredTasks: updatedSelectedTasks, selectedCategory: category };
+          }),
 
-      // Clear all selected tasks
-      clearTaskSelection: () =>
-        set((state) => ({
-          tasks_: state.tasks_.map((task) => ({ ...task, isSelected: false })),
-          selectedTasks: [],
-        })),
+        // Clear all selected tasks
+        clearTaskSelection: () =>
+          set((state) => ({
+            tasks_: state.tasks_.map((task) => ({ ...task, isSelected: false })),
+            selectedTasks: [],
+          })),
 
-      // Mark the selected task as submitted
-      submitTask: () =>
-        set((state) => {
-          if (!state.selectedTask) return state;
-          const updatedTasks = state.tasks_.map((task) =>
-            task.id === state.selectedTask!.id
-              ? { ...task, taskStatus: 'submitted' }
-              : task
-          );
-          return {
-            tasks_: updatedTasks,
-            selectedTask: {
-              ...state.selectedTask,
-              taskStatus: 'submitted',
-              isSelected: false, // Optionally deselect after submission
-            },
-          };
-        }),
-    }),
+        // Mark the selected task as submitted
+        submitTask: () =>
+          set((state) => {
+            if (!state.selectedTask) return state;
+            const updatedTasks = state.tasks_.map((task) =>
+              task.id === state.selectedTask!.id
+                ? { ...task, taskStatus: 'submitted' }
+                : task
+            );
+            return {
+              tasks_: updatedTasks,
+              selectedTask: {
+                ...state.selectedTask,
+                taskStatus: 'submitted',
+                isSelected: false, // Optionally deselect after submission
+              },
+            };
+          }),
+    })},
     {
       name: 'task-store', // Name for localStorage key
       partialize: (state) => ({ 

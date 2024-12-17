@@ -4,6 +4,7 @@ import useSWR from 'swr';
 import { BASE_API_URL } from '@/lib/constants';
 
 import apiClient from '../lib/apiClient';
+import { UserVerificationResponseType } from './types';
 
 const fetcher = async (url: string) => {
     const response = await apiClient.get(url);
@@ -27,29 +28,16 @@ export type UserResponseType = {
       iat: number; // JWT issued-at timestamp (epoch)
       exp: number; // JWT expiration timestamp (epoch)
     };
-  };
-  
+};
 
 export function useUserInfo() {
 
-    const { data: user, error, isValidating, mutate } = useSWR(`${BASE_API_URL}/auth/me`, fetcher, {
+    const { data: user, error, isValidating, mutate } = useSWR<UserVerificationResponseType>(`${BASE_API_URL}/auth/me`, fetcher, {
         // refreshInterval: 20, // Disables periodic revalidation
         refreshInterval: 0, // Disable periodic revalidation
         revalidateOnFocus: false, // Disable revalidation on window focus
         revalidateOnReconnect: false, // Disable revalidation on reconnect
     });
-
-    // if (isValidating) {
-    //     return {
-    //         user: "Loading..."
-    //     }
-    // }
-
-    // if (error) {
-    //     return {
-    //         user: "Error..."
-    //     }
-    // }
 
     return {
         user, 

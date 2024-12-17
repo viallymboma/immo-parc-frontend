@@ -37,7 +37,7 @@ export async function middleware(request: NextRequest) {
   // No token, redirect to login for other pages
   if (!token) {
     console.log("No token")
-    return NextResponse.redirect(loginUrl);
+    // return NextResponse.redirect(loginUrl);
   }
 
   // Token exists, allow access to protected pages

@@ -26,8 +26,12 @@ export default function SigninForm() {
     try {
       console.log(data, "datata")
       // return
-      await login(data.phone, data.password);
-      router.push("/backoffice"); // Redirect after successful login
+      const res = await login(data.phone, data.password);
+      console.log(res, "kkkkkkk")
+      // setUserCookies(res.info.accessToken);
+      // router.push("/backoffice"); // Redirect after successful login
+      // window.location.href="/backoffice";
+      // console.log("after push")
     } catch (err: any) {
       console.error("Login error:", err.message);
       // Handle login error

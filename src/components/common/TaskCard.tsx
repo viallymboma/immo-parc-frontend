@@ -4,6 +4,7 @@ import React from 'react';
 import Image from 'next/image'; // Use for the icon image (if applicable)
 import { useRouter } from 'next/navigation';
 
+import { useUserInfo } from '@/hooks/useUserInfo';
 import { useTaskStore } from '@/store/task-store';
 
 import { TaskDataType } from './backbone/other_component/data';
@@ -16,7 +17,13 @@ const TaskCardStyled: React.FC<TaskCardType> = ({ task }) => {
 
   const router = useRouter ()
 
+  const { user } = useUserInfo();
+
+  const numberOfTaskPerDay = user?.userInfo?.package?.numberOfTaskPerDay || 0;
+
   const { toggleCategory, toggleTaskSelection, selectTask,  } = useTaskStore();
+
+  console.log(task?.isSelected, "hellonothing========>")
 
   return (
     <>
@@ -34,8 +41,8 @@ const TaskCardStyled: React.FC<TaskCardType> = ({ task }) => {
         <div className='flex flex-row h-[90px]  items-center'>
             <div className=''
               onClick={ () => {
-                selectTask (task?.id as number); 
-                router?.push(`/backoffice/task-list/${ task?.id }`)
+                selectTask (task?._id as string); 
+                router?.push(`/backoffice/task-list/${ task?._id }`)
               }}
             >
               {/* <p className="text-sm font-bold">Demande: {task.taskTitle}</p> */}
@@ -47,17 +54,17 @@ const TaskCardStyled: React.FC<TaskCardType> = ({ task }) => {
 
             <div className='flex items-center justify-center w-[100px] h-[100px]'>
               <label
-                htmlFor={`task-${task.id}`}
+                htmlFor={`task-${task._id}`}
                 className="flex items-center space-x-2 cursor-pointer"
               >
                 <input
-                  id={`task-${task?.id}`} // Unique ID for each checkbox
+                  id={`task-${task?._id}`} // Unique ID for each checkbox
                   type="checkbox"
                   hidden
                   checked={task?.isSelected} // Reflect the isSelected state
                   onChange={() => {
-                    toggleTaskSelection(task?.id as number); // Toggle selection on change
-                    console.log("Toggled task ID:", task?.id); // Debugging log
+                    toggleTaskSelection(task?._id as string, numberOfTaskPerDay); // Toggle selection on change
+                    console.log("Toggled task ID:", task?._id); // Debugging log
                   }}
                 />
                 <div className={`w-10 h-10 flex items-center justify-center rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 ${ task?.isSelected ? "bg-yellow-500" : "bg-transparent" } hover:text-white transition duration-300`}>

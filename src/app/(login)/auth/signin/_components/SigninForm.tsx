@@ -29,7 +29,7 @@ export default function SigninForm() {
       const res = await login(data.phone, data.password);
       console.log(res, "kkkkkkk")
       // setUserCookies(res.info.accessToken);
-      // router.push("/backoffice"); // Redirect after successful login
+      router.push("/backoffice"); // Redirect after successful login
       // window.location.href="/backoffice";
       // console.log("after push")
     } catch (err: any) {

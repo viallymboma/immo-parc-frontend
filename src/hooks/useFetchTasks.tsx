@@ -9,7 +9,7 @@ import { useTaskStore } from '@/store/task-store';
 import { useUserInfo } from './useUserInfo';
 
 const fetcher = async (url: string) => {
-    const response = await apiClient.get(url);
+    const response = await apiClient.get(url, { withCredentials: true });
     return response.data;
 };
 

@@ -7,7 +7,7 @@ import apiClient from '../lib/apiClient';
 import { UserVerificationResponseType } from './types';
 
 const fetcher = async (url: string) => {
-    const response = await apiClient.get(url);
+    const response = await apiClient.get(url, { withCredentials: true });
     return response.data;
 };
 

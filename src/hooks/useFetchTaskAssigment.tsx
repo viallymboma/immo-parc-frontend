@@ -6,7 +6,7 @@ import apiClient from '@/lib/apiClient';
 import { BASE_API_URL } from '@/lib/constants';
 
 const fetcher = async (url: string) => {
-    const response = await apiClient.get(url);
+    const response = await apiClient.get(url, { withCredentials: true });
     return response.data;
 };
 

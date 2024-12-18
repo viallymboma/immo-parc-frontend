@@ -15,7 +15,7 @@ export function useAuth() {
 
     const logout = async () => {
         try {
-            await apiClient.get('/auth/logout');
+            await apiClient.get('/auth/logout', { withCredentials: true });
             // mutate(null); // Clear user data
         } catch (err) {
             console.error('Logout failed:', err);

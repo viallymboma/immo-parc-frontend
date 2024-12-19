@@ -1,6 +1,7 @@
 "use client";
-// import { useRouter } from 'next/navigation';
+import { removeUserCookies } from '@/lib/cookies';
 
+// import { useRouter } from 'next/navigation';
 import apiClient from '../lib/apiClient';
 
 export function useAuth() {
@@ -21,6 +22,7 @@ export function useAuth() {
     const logout = async () => {
         try {
             await apiClient.get('/auth/logout', { withCredentials: true });
+            removeUserCookies ()
             window.location.href = '/auth/signin';
         } catch (err) {
             console.error('Logout failed:', err);

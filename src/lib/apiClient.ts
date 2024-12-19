@@ -2,7 +2,10 @@ import axios from 'axios';
 
 import { BASE_API_URL } from './constants';
 
+// import { BASE_API_URL } from './constants';
+
 const apiClient = axios.create({
+  // baseURL: `${BASE_API_URL}`, // Set your API base URL
   baseURL: `${BASE_API_URL}`, // Set your API base URL
   withCredentials: true, // Include cookies with requests
   // baseURL: process.env.NEXT_PUBLIC_API_BASE_URL, // Set your API base URL

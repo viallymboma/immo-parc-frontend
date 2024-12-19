@@ -156,7 +156,7 @@ const DropdownUser = () => {
           <div className="p-2.5">
             <Link onClick={() => {
               logout (); 
-              router.replace('/login');
+              router.replace('/auth/signin');
             }} href={"/auth/signin"} className="flex w-full items-center gap-2.5 rounded-[7px] p-2.5 text-sm font-medium text-dark-4 duration-300 ease-in-out hover:bg-gray-2 hover:text-dark dark:text-dark-6 dark:hover:bg-dark-3 dark:hover:text-white lg:text-base">
               <svg
                 className="fill-current"

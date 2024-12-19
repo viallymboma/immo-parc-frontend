@@ -16,6 +16,7 @@ const fetcher = async (url: string) => {
 const useFetchTasks = () => {
     const { user } = useUserInfo (); 
     const { setTasks } = useTaskStore();
+    // const { data: tasksDataSet, error, isValidating, mutate } = useSWR(`${BASE_API_URL}/tasks/users-tasks`, fetcher, {
     const { data: tasksDataSet, error, isValidating, mutate } = useSWR(`${BASE_API_URL}/tasks/users-tasks`, fetcher, {
         onSuccess: (tasks) => {
             // Update Zustand store when data is fetched

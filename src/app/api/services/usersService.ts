@@ -1,18 +1,19 @@
 // services/usersService.ts
 import bcrypt from 'bcryptjs';
-import mongoose from 'mongoose';
+
+import { connectToDatabase } from '@/app/lib/mongodb';
 
 import { INITIAL_SELECTED_TASKCOUNT } from '../constants';
 import { Packages } from '../models';
 import User, { IUser } from '../models/User';
 
 // Ensure mongoose connection is made
-async function connectToDatabase() {
-  if (mongoose.connections[0].readyState) {
-    return;
-  }
-  await mongoose.connect(process.env.MONGODB_URI!);
-}
+// async function connectToDatabase() {
+//   if (mongoose.connections[0].readyState) {
+//     return;
+//   }
+//   await mongoose.connect(process.env.MONGODB_URI!);
+// }
 
 export const usersService = {
   async createUser(
@@ -24,6 +25,7 @@ export const usersService = {
     firstName?: string,
     lastName?: string
   ): Promise<IUser> {
+    console.log(phone, password, packageId, parentId, email, firstName, lastName, "good")
     await connectToDatabase();
     const parent: any = parentId ? await this.findByPhone(parentId) : null;
     if (!parent) throw new Error('Parent not found');
@@ -38,6 +40,8 @@ export const usersService = {
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
+
+    console.log(hashedPassword, "hased pass")
 
     const user = new User({
       username: `user_${Date.now()}`,
@@ -55,9 +59,12 @@ export const usersService = {
       children: []
     });
 
+    console.log(user, "user thing")
+
     await user.save();
 
     if (parent) {
+      console.log("has a parent")
       parent?.children.push(user._id);
       await parent.save();
     }

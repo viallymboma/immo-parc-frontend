@@ -8,7 +8,7 @@ export async function GET() {
     httpOnly: true, // Ensure the cookie cannot be accessed via JavaScript
     maxAge: 0, // Expire the cookie immediately
     // sameSite: 'strict', // Uncomment if needed
-    // secure: true, // Uncomment if your app is served over HTTPS
+    secure: true, // Uncomment if your app is served over HTTPS
   });
 
   return response;

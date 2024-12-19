@@ -1,17 +1,17 @@
 "use client";
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 
 import apiClient from '../lib/apiClient';
 
 export function useAuth() {
 
-    const router = useRouter ()
+    // const router = useRouter ()
 
     const login = async (phone: string, password: string) => {
         try {
             // const response = await apiClient.post(`${BASE_API_URL}/auth/login`, { phone, password }, { withCredentials: true });
-            const response = await apiClient.post(`/auth/login`, { phone, password }, { withCredentials: true });
             // const response = await axios.post(`/auth/login`, { phone, password }, { withCredentials: true });
+            const response = await apiClient.post(`/auth/login`, { phone, password }, { withCredentials: true });
             return response.data;
         } catch (err: any) {
             throw new Error(err.response?.data?.message || 'Login failed');
@@ -21,8 +21,7 @@ export function useAuth() {
     const logout = async () => {
         try {
             await apiClient.get('/auth/logout', { withCredentials: true });
-            // mutate(null); // Clear user data
-            router.push("/auth/signin")
+            window.location.href = '/auth/signin';
         } catch (err) {
             console.error('Logout failed:', err);
         }

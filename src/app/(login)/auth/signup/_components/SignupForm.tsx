@@ -54,7 +54,7 @@ const SignupForm = () => {
     }
     console.log(data, "what is going?"); 
     // return
-    const response = await apiClient.post('/users/create-regular-user', data); 
+    const response = await apiClient.post('/users/create-regular-user', data, { withCredentials: true }); 
     router.push ("/auth/signin"); 
     // return response.data; 
   }

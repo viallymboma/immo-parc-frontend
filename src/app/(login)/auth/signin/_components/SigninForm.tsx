@@ -25,14 +25,8 @@ export default function SigninForm() {
   const onSubmit = async (data: SigninFormValues) => {
     try {
       console.log(data, "datata")
-      // return
       const res = await login(data.phone, data.password);
-      console.log(res, "kkkkkkk")
-      // return
-      // setUserCookies(res.info.accessToken);
       router.push("/backoffice"); // Redirect after successful login
-      // window.location.href="/backoffice";
-      // console.log("after push")
     } catch (err: any) {
       console.error("Login error:", err.message);
       // Display login error in the UI

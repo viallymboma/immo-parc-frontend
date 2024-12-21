@@ -16,13 +16,14 @@ import { useTaskStore } from '@/store/task-store';
 const TaskListModule = () => {
     const { tasks_, selectedCategory, filteredTasks, toggleCategory } = useTaskStore(); 
     const { taskAssignment } = useFetchTaskAssigments ()
-    console.log(tasks_, "pp666pppppppppppppp", taskAssignment)
+    // console.log(tasks_, "pp666pppppppppppppp", taskAssignment)
+    console.log(filteredTasks, "jjjjjjjjjjjhhhhhhhh", taskAssignment)
     const extractCategories = Array.from(new Set(
         tasks_?.map((prop: TaskDataType) => prop?.taskStatus)
     ));
     // const extractCategories = tasks_?.map((prop: TaskDataType) => prop?.taskStatus);
     // const filteredTasks = tasks_?.filter((prop: TaskDataType) => prop?.taskStatus === selectedCategory)
-    console.log(extractCategories, "pppppppppppppppp")
+    console.log(extractCategories, "pppppppppppppppp", )
     return (
         <div>
             <div className='flex flex-row gap-3'>

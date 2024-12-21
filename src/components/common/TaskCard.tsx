@@ -7,6 +7,7 @@ import { useRouter } from 'next/navigation';
 import { useUserInfo } from '@/hooks/useUserInfo';
 import { useTaskStore } from '@/store/task-store';
 
+// import { useTaskStore } from '@/store/task-store';
 import { TaskDataType } from './backbone/other_component/data';
 
 type TaskCardType = {
@@ -21,9 +22,9 @@ const TaskCardStyled: React.FC<TaskCardType> = ({ task }) => {
 
   const numberOfTaskPerDay = user?.userInfo?.package?.numberOfTaskPerDay || 0;
 
-  const { toggleCategory, toggleTaskSelection, selectTask,  } = useTaskStore();
+  const { toggleTaskSelectionV2  } = useTaskStore();
 
-  console.log(task?.isSelected, "hellonothing========>")
+  // console.log(task?.isSelected, "hellonothing========>", numberOfTaskPerDay)
 
   return (
     <>
@@ -41,7 +42,7 @@ const TaskCardStyled: React.FC<TaskCardType> = ({ task }) => {
         <div className='flex flex-row h-[90px]  items-center'>
             <div className=''
               onClick={ () => {
-                selectTask (task?._id as string); 
+                // selectTask (task?._id as string); 
                 router?.push(`/backoffice/task-list/${ task?._id }`)
               }}
             >
@@ -63,7 +64,8 @@ const TaskCardStyled: React.FC<TaskCardType> = ({ task }) => {
                   hidden
                   checked={task?.isSelected} // Reflect the isSelected state
                   onChange={() => {
-                    toggleTaskSelection(task?._id as string, numberOfTaskPerDay); // Toggle selection on change
+                    // toggleTaskSelection(task?._id as string, numberOfTaskPerDay); // Toggle selection on change
+                    toggleTaskSelectionV2(task?._id as string, numberOfTaskPerDay, user?.userInfo?._id) // Toggle selection on change
                     console.log("Toggled task ID:", task?._id); // Debugging log
                   }}
                 />

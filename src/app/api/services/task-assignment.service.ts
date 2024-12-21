@@ -29,9 +29,13 @@ export class TaskAssignmentService {
         user: userId,
         createdAt: { $gte: startOfDay, $lte: endOfDay }, // Filter by today's date
       })
-      .populate('task')
       .populate({
-        path: 'packageId',
+        path: 'task', 
+        populate: 'packageId'
+      })
+      .populate({
+        path: 'user',
+        model: 'User'
       });
 
     return taskAssignments;
@@ -47,7 +51,18 @@ export class TaskAssignmentService {
 
     const today = new Date();
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999)); 
+
+    // Check if the task has already been assigned to the user today
+    const existingAssignment = await this.taskAssignmentModel.findOne({
+      user: user._id,
+      task: taskId,
+      createdAt: { $gte: startOfDay, $lte: endOfDay },
+    });
+
+    if (existingAssignment) {
+      throw new Error('This task has already been assigned to you for today.');
+    }
 
     const tasksAssignedToday = await this.taskAssignmentModel.countDocuments({
       user: user._id,
@@ -61,21 +76,56 @@ export class TaskAssignmentService {
     }
 
     const task = await this.taskModel.findById(taskId);
-    if (!task || task.taskStatus !== 'unassigned') {
-      throw new Error('Task not available for assignment.');
-    }
 
-    const assignment = new this.taskAssignmentModel({ user: user._id, task: task._id });
+    // REMOVING THE BELOW CODE BECAUSE IT EVERYONE WILL USE THE SAME TASK
+    // SO WE CANNOT CHANGE STATUS HERE ELSE IT WILL PREVENT OTHERS FROM SELECTING THE TASK
+    // if (!task || task.taskStatus !== 'unassigned') {
+    //   throw new Error('Task not available for assignment.');
+    // }
+
+    const assignment = new this.taskAssignmentModel({ user: user._id, task: task?._id });
     await assignment.save();
 
-    task.taskStatus = 'assigned';
-    await task.save();
+    // task.taskStatus = 'assigned';
+    // await task.save();
 
     user.selectedTasksCount += 1;
     await user.save();
 
     return assignment;
   }
+
+  async deleteTaskAssignment(userId: string, taskId: string): Promise<ITaskAssignment | null> {
+    const today = new Date();
+    const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+  
+    // Find the task assignment
+    const taskAssignment = await this.taskAssignmentModel.findOneAndDelete({
+      user: userId,
+      task: taskId,
+      createdAt: { $gte: startOfDay, $lte: endOfDay },
+    });
+  
+    if (taskAssignment) {
+      // Update the task status back to 'unassigned'
+      const task = await this.taskModel.findById(taskAssignment.task);
+      if (task) {
+        task.taskStatus = 'unassigned';
+        await task.save();
+      }
+  
+      // Decrement the selectedTasksCount for the user
+      const user = await this.userModel.findById(userId);
+      if (user) {
+        user.selectedTasksCount = Math.max(user?.selectedTasksCount! - 1, 0);
+        await user.save();
+      }
+    }
+  
+    return taskAssignment;
+  }
+  
 }
 
 

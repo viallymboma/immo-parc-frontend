@@ -10,6 +10,7 @@ import {
 export interface ITaskAssignment extends Document {
   user: Types.ObjectId; // Reference to Users
   task: Types.ObjectId; // Reference to Task
+  picture?: any;
   status: 'pending' | 'in-progress' | 'completed'; // Task status
 }
 
@@ -18,6 +19,11 @@ const TaskAssignmentSchema = new Schema<ITaskAssignment>(
     {
         user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
         task: { type: Schema.Types.ObjectId, ref: 'Task', required: true },
+        picture: {
+          name: { type: String, required: false }, 
+          public_id: { type: String, required: false }, 
+          url: { type: String, required: false }, 
+        },
         status: {
             type: String,
             enum: ['pending', 'in-progress', 'completed'],

@@ -1,3 +1,4 @@
+// "use client";
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
 
@@ -16,7 +17,9 @@ interface TaskState {
   filteredTasks?: TaskDataType[]; // Array of selected tasks
   setTasks: (tasks_: TaskDataType[]) => void; // Load all tasks
   toggleTaskSelection: (id: number | string, numberOfTaskPerDay: number) => void; // Add or remove a task from the selection
-  toggleCategory: (category: string) => void 
+  toggleTaskSelectionV2: (id: number | string, numberOfTaskPerDay: number, userId: string) => void; // Add or remove a task from the selection
+  setSelectedTaskFromBack: (filteredTasks: any) => void;
+  toggleCategory: (category: string) => void; 
   clearTaskSelection: () => void; // Clear all selected tasks
   selectTask: (id: number | string) => void; // Select a specific task by ID
   submitTask: () => void; // Mark the selected task as submitted
@@ -45,6 +48,30 @@ export const useTaskStore = create<TaskState>()(
             };
           }),
 
+        // Load all tasks
+        setSelectedTaskFromBack: (filteredTasks: any) =>
+          set((state) => {
+            console.log(filteredTasks, "in the store==============>")
+            return {
+              ...state,
+              filteredTasks,
+            };
+          }),
+
+        // // Load all tasks
+        // setFilteredTasks: (filteredTasks: any) =>
+        //   set((state) => {
+        //     // Get filteredTasks from the current state if any filteredTasks from our persistant
+        //     const filteredTasksIds = state.selectedTasks.map((task) => task._id);
+
+        //     return {
+        //       tasks_: filteredTasks.map((filteredTask: any) => ({
+        //         ...filteredTask,
+        //         isSelected: filteredTasksIds.includes(filteredTasks._id) || filteredTasks.isSelected || false, // Mark as selected if in selectedTasks
+        //       })),
+        //     };
+        //   }),
+
         // Select a specific task by ID
         selectTask: (id) =>
           set((state) => ({
@@ -53,6 +80,78 @@ export const useTaskStore = create<TaskState>()(
               task._id === id ? { ...task, isSelected: true } : { ...task, isSelected: false }
             ),
           })),
+
+        toggleTaskSelectionV2: async (id: any, maxTasks: any, userId: any) => {
+          const taskIndex = get().tasks_.findIndex((task) => task._id === id);
+          if (taskIndex === -1) return; // Task not found
+
+          const task = get().tasks_[taskIndex];
+          const isSelected = !task.isSelected;
+
+          // console.log(get().selectedTasks, isSelected, 'hellooooouuuuuuu');
+
+          // Check the maxTasks limit
+          if (isSelected && get().selectedTasks.length >= maxTasks) {
+            alert(`You can only select up to ${maxTasks} tasks per day.`);
+            return;
+          }
+
+          try {
+            if (isSelected) {
+              // // Unassign task by calling the DELETE endpoint
+              const data = await fetch(`${BASE_API_URL}/task-assignment/assign`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, taskId: id }),
+              });
+      
+              // Update state after successful request
+              set((state) => {
+                const updatedTasks = state.tasks_.map((t) =>
+                  t._id === id ? { ...t, isSelected: true } : t
+                );
+      
+                // const updatedSelectedTasks = state.selectedTasks.filter(
+                //   (t) => t._id !== id
+                // );
+                const updatedSelectedTasks = isSelected
+                ? [...state.selectedTasks, { ...task, isSelected }]
+                : state.selectedTasks.filter((t) => t._id !== id);
+      
+                return { tasks_: updatedTasks, selectedTasks: updatedSelectedTasks };
+              });
+            } else {
+              // // Unassign task by calling the DELETE endpoint
+              const data = await fetch(`${BASE_API_URL}/task-assignment/unassign`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ userId, taskId: id }),
+              });
+      
+              // Update state after successful request
+              set((state) => {
+                const updatedTasks = state.tasks_.map((t) =>
+                  t._id === id ? { ...t, isSelected: false } : t
+                );
+      
+                // const updatedSelectedTasks = [
+                //   ...state.selectedTasks,
+                //   { ...task, isSelected: true },
+                // ];
+                const updatedSelectedTasks = isSelected
+                ? [...state.selectedTasks, { ...task, isSelected }]
+                : state.selectedTasks.filter((t) => t._id !== id);
+
+                return { tasks_: updatedTasks, selectedTasks: updatedSelectedTasks };
+              });
+              
+            }
+          } catch (error: any) {
+            console.error(error.message);
+            alert('Failed to update task selection. Please try again.');
+          }
+        },
+
 
         // Add or remove a task from the selection
         toggleTaskSelection: (id, maxTasks) =>
@@ -110,7 +209,6 @@ export const useTaskStore = create<TaskState>()(
             if (category === "Toutes") {
               updatedSelectedTasks = state?.tasks_
             }
-            // console.log(updatedSelectedTasks, "jjjjjjjjjj"); 
             return { ...state, filteredTasks: updatedSelectedTasks, selectedCategory: category };
           }),
 
@@ -165,6 +263,73 @@ export const useTaskStore = create<TaskState>()(
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+              // const mutation = useDynamicSWRMutationAsssignTask(`${BASE_API_URL}/task-assignment/unassign`);
+              // // Unassign task by calling the DELETE endpoint
+              // const data = await mutation.trigger({
+              //   method: 'DELETE',
+              //   body: { userId, taskId: id },
+              // });
+
+              // // const mutation = useDynamicSWRMutationAsssignTask(`${BASE_API_URL}/task-assignment/unassign`);
+              // // // Unassign task by calling the DELETE endpoint
+              // // const data = await mutation.trigger({
+              // //   method: 'DELETE',
+              // //   body: { userId, taskId: id },
+              // // });
+
+              // // // Unassign task by calling the DELETE endpoint
+              // const data = await fetch(`${BASE_API_URL}/task-assignment/unassign`, {
+              //   method: 'DELETE',
+              //   headers: { 'Content-Type': 'application/json' },
+              //   body: JSON.stringify({ userId, taskId: id }),
+              // });
+      
+              // // Update state after successful request
+              // set((state) => {
+              //   const updatedTasks = state.tasks_.map((t) =>
+              //     t._id === id ? { ...t, isSelected: true } : t
+              //   );
+      
+              //   const updatedSelectedTasks = [
+              //     ...state.selectedTasks,
+              //     { ...task, isSelected: true },
+              //   ];
+
+              //   return { tasks: updatedTasks, selectedTasks: updatedSelectedTasks };
+              // });
+              // const mutation = useDynamicSWRMutationAsssignTask(`${BASE_API_URL}/task-assignment/assign`);
+              // // Unassign the task
+              // await mutation.trigger({
+              //   method: 'POST',
+              //   body: { userId, taskId: id },
+              // });
 
 
 // CODE WITHOUT PERSISTANCE

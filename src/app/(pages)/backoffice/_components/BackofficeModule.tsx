@@ -25,6 +25,7 @@ import TaskCardStyled from '@/components/common/TaskCard';
 import useFetchTasks from '@/hooks/useFetchTasks';
 import { useTaskStore } from '@/store/task-store';
 
+// import { useTaskStore } from '@/store/task-store';
 import AboutUs from './about-us/AboutUs';
 import TestimonialList from './testimonials/TestimonialList';
 

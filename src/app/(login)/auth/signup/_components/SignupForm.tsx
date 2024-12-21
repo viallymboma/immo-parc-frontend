@@ -37,7 +37,7 @@ const SignupForm = () => {
     register, 
     handleSubmit, 
     reset, 
-    formState: {errors, isValid }, 
+    formState: { isLoading, isSubmitting, isSubmitted, errors, isValid }, 
   } = useForm <SignupFormType> (); 
 
   const [ showPassword, setShowPassword ] = React.useState <boolean> (false)
@@ -52,11 +52,37 @@ const SignupForm = () => {
       ...data, 
       parentId: supervisor
     }
-    console.log(data, "what is going?"); 
-    // return
-    const response = await apiClient.post('/users/create-regular-user', data, { withCredentials: true }); 
-    router.push ("/auth/signin"); 
-    // return response.data; 
+    try {
+      const response = await apiClient.post('/users/create-regular-user', data, {
+        withCredentials: true,
+      });
+      console.log(response, "response");
+      router.push("/auth/signin");
+    } catch (error: any) {
+      // Check if the error is from Axios and has a response
+      if (error.response) {
+        console.error("Error Response:", error.response.data); // The server response
+        console.error("Error Status:", error.response.status); // HTTP status code
+        console.error("Error Headers:", error.response.headers); // Response headers
+  
+        // Optionally show the error message in the UI
+        alert(`Error: ${error.response.data.message || 'Something went wrong!'}`);
+      } else if (error.request) {
+        // No response was received from the server
+        console.error("Error Request:", error.request);
+        alert("Error: No response from the server.");
+      } else {
+        // Something went wrong while setting up the request
+        console.error("Error Message:", error.message);
+        alert(`Error: ${error.message}`);
+      }
+    }
+    // console.log(data, "what is going?"); 
+    // // return
+    // const response = await apiClient.post('/users/create-regular-user', data, { withCredentials: true }); 
+    // console.log(response, "response")
+    // router.push ("/auth/signin"); 
+    // // return response.data; 
   }
 
   return (
@@ -159,14 +185,32 @@ const SignupForm = () => {
       </div>
 
 
-      <div className="mb-4.5">
+      {/* <div className="mb-4.5">
         <Button
           type="submit"
           className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90"
         >
           Créer
         </Button>
+      </div> */}
+      {/* Submit Button */}
+      <div className="mb-4.5">
+        <Button
+          type="submit"
+          disabled={isSubmitting} // Disable button during submission
+          className={`flex w-full items-center justify-center gap-2 rounded-lg p-4 font-medium text-white transition ${
+            isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-primary hover:bg-opacity-90"
+          }`}
+        >
+          {isSubmitting ? "Connexion en cours..." : "Créer"}
+        </Button>
       </div>
+
+      {/* Loading/Success Indicators */}
+      {isLoading && <p className="text-center text-blue-500">Chargement...</p>}
+      {isSubmitted && !isSubmitting && (
+        <p className="text-center text-green-500">Enregistrement réussie !</p>
+      )}
     </form>
   );
 }

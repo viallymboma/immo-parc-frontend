@@ -24,9 +24,16 @@ export const usersService = {
     email?: string,
     firstName?: string,
     lastName?: string
-  ): Promise<IUser> {
+  ): Promise<IUser | any> {
     console.log(phone, password, packageId, parentId, email, firstName, lastName, "good")
     await connectToDatabase();
+
+    // Check if Ce numero existe deja dans le system
+    const existingUser = await User.findOne({ phone });
+    if (existingUser) {
+      return { error: 'Ce numero existe deja dans le system' };
+    }
+
     const parent: any = parentId ? await this.findByPhone(parentId) : null;
     if (!parent) throw new Error('Parent not found');
 

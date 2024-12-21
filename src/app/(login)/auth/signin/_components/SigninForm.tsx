@@ -16,7 +16,7 @@ interface SigninFormValues {
 }
 
 export default function SigninForm() {
-  const { register, handleSubmit, formState: { errors } } = useForm<SigninFormValues>();
+  const { register, handleSubmit, formState: { isLoading, isSubmitting, isSubmitted, errors } } = useForm<SigninFormValues>();
   const router = useRouter();
   const { login } = useAuth();
 
@@ -35,7 +35,10 @@ export default function SigninForm() {
       // console.log("after push")
     } catch (err: any) {
       console.error("Login error:", err.message);
-      // Handle login error
+      // Display login error in the UI
+      if (err.response?.status === 401) {
+        alert("Invalid credentials. Please try again.");
+      }
     }
   };
 
@@ -123,16 +126,35 @@ export default function SigninForm() {
       </div>
 
       {/* Submit Button */}
-      <div className="mb-4.5">
+      {/* <div className="mb-4.5">
         <Button
           type="submit"
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90"
         >
           Se connecter
         </Button>
+      </div> */}
+      {/* Submit Button */}
+      <div className="mb-4.5">
+        <Button
+          type="submit"
+          disabled={isSubmitting} // Disable button during submission
+          className={`flex w-full items-center justify-center gap-2 rounded-lg p-4 font-medium text-white transition ${
+            isSubmitting ? "bg-gray-400 cursor-not-allowed" : "bg-primary hover:bg-opacity-90"
+          }`}
+        >
+          {isSubmitting ? "Connexion en cours..." : "Se connecter"}
+        </Button>
       </div>
+
+      {/* Loading/Success Indicators */}
+      {/* {isLoading && <p className="text-center text-blue-500">Chargement...</p>}
+      {isSubmitted && !isSubmitting && (
+        <p className="text-center text-green-500">Connexion réussie !</p>
+      )} */}
     </form>
   );
+
 }
 
 

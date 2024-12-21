@@ -7,10 +7,21 @@ import { User } from '../models';
 // Utility to validate credentials and generate a token
 export const validateUser = async (phone: string, password: string) => {
   const user = await User.findOne({ phone }).populate(['parent', 'children', 'package']);
-  if (user && (await bcrypt.compare(password, user.password))) {
-    return user;
+  // if (user && (await bcrypt.compare(password, user.password))) {
+  //   return user;
+  // }
+  // throw new Error('Invalid credentials');
+  if (!user) {
+    // User with the given phone number does not exist
+    throw new Error('Numero introuvable dans le system.');
   }
-  throw new Error('Invalid credentials');
+
+  const isPasswordValid = await bcrypt.compare(password, user.password);
+  if (!isPasswordValid) {
+    // Password is incorrect
+    throw new Error('Incorrect password.');
+  }
+  return user;
 };
 
 export const loginUser = async (user: any) => {

@@ -12,7 +12,7 @@ export interface IUser extends Document {
     firstName?: string;
     lastName?: string;
     phone?: string;
-    password: string;
+    password?: string;
     parent?: Types.ObjectId;
     children?: Types.ObjectId[];
     funds?: number;
@@ -22,6 +22,7 @@ export interface IUser extends Document {
     status?: 'active' | 'inactive';
     package?: Types.ObjectId | null;
     internshipExpiry?: Date;
+    error?: string;
 }
 
 // Define the schema

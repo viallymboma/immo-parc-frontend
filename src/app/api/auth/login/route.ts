@@ -50,7 +50,20 @@ export async function POST(request: Request) {
 
     return response;
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 401 });
+    // return NextResponse.json({ error: error.message }, { status: 401 });
+    // Handle errors from validateUser function
+    const errorMessage = error.message;
+
+    if (errorMessage === 'Numero introuvable dans le system.') {
+      return NextResponse.json({ error: 'Numero introuvable dans le system.' }, { status: 404 });
+    }
+
+    if (errorMessage === 'Incorrect password.') {
+      return NextResponse.json({ error: 'Mot de passe incorrect.' }, { status: 401 });
+    }
+
+    // Generic error handling
+    return NextResponse.json({ error: 'Une erreur inattendu est survenue.' }, { status: 500 });
   }
 }
 

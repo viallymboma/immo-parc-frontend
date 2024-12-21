@@ -1,8 +1,8 @@
 import mongoose from 'mongoose';
 
 const MONGODB_URI =
-  // 'mongodb+srv://mbomadesir:gt1xQPboLPYGv4cs@immoparc.jigjs.mongodb.net/immo_parc_db';
-  'mongodb://localhost:27017/immo_parc_db';
+  'mongodb+srv://mbomadesir:gt1xQPboLPYGv4cs@immoparc.jigjs.mongodb.net/immo_parc_db';
+  // 'mongodb://localhost:27017/immo_parc_db';
 
 if (!MONGODB_URI) {
   throw new Error('Please define the MONGODB_URI environment variable');

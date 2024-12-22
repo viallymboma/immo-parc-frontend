@@ -8,6 +8,9 @@ import {
   Headphones,
   Youtube,
 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+
+import { BASE_API_URL } from '@/lib/constants';
 
 import { Button } from '../ui/button';
 import {
@@ -25,6 +28,18 @@ type TaskDetailCardProps = {
 
 const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
     const { submitTask } = task;
+    console.log(task, "the task....")
+    const router = useRouter ()
+    // Function to copy the URL to clipboard
+    const copyToClipboard = async () => {
+        try {
+            await navigator.clipboard.writeText(task?.taskLink);
+            alert("URL copied to clipboard!");
+        } catch (error) {
+            console.error("Failed to copy URL:", error);
+            alert("Failed to copy URL");
+        }
+    };
     return (
         <Card className="w-full max-w-xl bg-white rounded-xl shadow-lg overflow-hidden">
             <CardHeader className="space-y-4 p-6">
@@ -57,7 +72,7 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
-                                    alert(`Selected file: ${file.name}`); // Handle file selection
+                                        alert(`Selected file: ${file.name}`); // Handle file selection
                                     }
                                 }}
                             />
@@ -68,7 +83,7 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                         </label>
                     </div>
 
-                    <div className="text-xl font-bold text-red-500">XOF : {task?.taskRemuneration}</div>
+                    <div className="text-xl font-bold text-red-500">XOF : {task?.packageId?.priceEarnedPerTaskDone }</div>
                 </div>
             </CardHeader>
 
@@ -83,7 +98,31 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
 
                     <div className="flex items-center justify-between text-sm text-gray-500">
                         <span>Audit :</span>
-                        <Button variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700">
+                        <Button 
+                        onClick={async () => {
+                            // router.push(`${ task?.taskLink }`)
+                            if (task?.taskLink) {
+                                window.open(task.taskLink, '_blank');
+
+                                // Call the API to update the status
+                                const response = await fetch(`${BASE_API_URL}/task-assignment/update-status`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({ taskAssignmentId: task?.id }), // Adjust based on task ID field
+                                    });
+
+                                    const result = await response.json();
+
+                                    if (!response.ok) {
+                                    throw new Error(result.error || 'Failed to update task status');
+                                    }
+
+                                    alert('Task status updated to in-progress');
+                            }
+                        }}
+                        variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700">
                             <ExternalLink className="w-4 h-4 mr-1" />
                             Ouvrir le lien
                         </Button>
@@ -91,7 +130,9 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
 
                     <div className="flex items-center justify-between text-sm text-gray-500">
                         <span>Lien :</span>
-                        <Button variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700">
+                        <Button
+                        onClick={ copyToClipboard }
+                        variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700">
                             <Copy className="w-4 h-4 mr-1" />
                             Copiez le lien
                         </Button>

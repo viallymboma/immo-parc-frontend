@@ -136,13 +136,22 @@ export const menuGroups = [
     },
 ];
 
+// export const taskStatus = [
+//     "Toutes", 
+//     "Sélectionnées", 
+//     "Completée", 
+//     "Echouée", 
+//     "Abandonné", 
+//     "Expirée"
+// ]
+
 export const taskStatus = [
     "Toutes", 
-    "Sélectionnées", 
-    "Completée", 
-    "Echouée", 
+    "pending", 
+    "in-progress", 
+    "completed", 
     "Abandonné", 
-    "Expirée"
+    "expired"
 ]
 
 const getRandomTaskStatus = () => {
@@ -179,6 +188,7 @@ export type TaskDataType = {
     taskCategory?: string; 
     taskLink: string;
     taskStatus: string;
+    status?: string;
     imageUrl?: string | null;
     createdAt?: string; // Optional field
     isSelected?: boolean; // New property to indicate selection state

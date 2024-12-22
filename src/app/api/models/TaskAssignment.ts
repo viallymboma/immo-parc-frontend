@@ -11,7 +11,9 @@ export interface ITaskAssignment extends Document {
   user: Types.ObjectId; // Reference to Users
   task: Types.ObjectId; // Reference to Task
   picture?: any;
-  status: 'pending' | 'in-progress' | 'completed'; // Task status
+  startTime?: string;
+  endTime?: string;
+  status: 'pending' | 'in-progress' | 'completed' | 'expired'; // Task status
 }
 
 // Define the Mongoose schema for TaskAssignment
@@ -24,9 +26,11 @@ const TaskAssignmentSchema = new Schema<ITaskAssignment>(
           public_id: { type: String, required: false }, 
           url: { type: String, required: false }, 
         },
+        startTime: { type: String, required: false }, 
+        endTime: { type: String, required: false }, 
         status: {
             type: String,
-            enum: ['pending', 'in-progress', 'completed'],
+            enum: ['pending', 'in-progress', 'completed', "expired"],
             default: 'pending',
         },
     },

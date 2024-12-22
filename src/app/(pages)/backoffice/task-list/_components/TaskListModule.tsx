@@ -3,8 +3,8 @@ import React from 'react';
 
 import {
   TaskDataType,
-  taskStatus,
 } from '@/components/common/backbone/other_component/data';
+// taskStatus,
 import NavigationContent
   from '@/components/common/navigation/NavigationContent';
 import TaskDetailCard from '@/components/common/TaskDetailCard';
@@ -14,15 +14,13 @@ import { useTaskStore } from '@/store/task-store';
 // import TaskList from '@/components/common/TaskList';
 
 const TaskListModule = () => {
-    const { tasks_, selectedCategory, filteredTasks, toggleCategory } = useTaskStore(); 
+    const { tasks_, selectedCategory, filteredTasks, filteredTasksFromBackend, toggleCategory } = useTaskStore(); 
     const { taskAssignment } = useFetchTaskAssigments ()
-    // console.log(tasks_, "pp666pppppppppppppp", taskAssignment)
-    console.log(filteredTasks, "jjjjjjjjjjjhhhhhhhh", taskAssignment)
+    console.log(filteredTasks, "jjjjjjjjjjjhhhhhhhh", filteredTasksFromBackend)
     const extractCategories = Array.from(new Set(
-        tasks_?.map((prop: TaskDataType) => prop?.taskStatus)
+        filteredTasksFromBackend?.map((prop: TaskDataType) => prop?.status)
     ));
-    // const extractCategories = tasks_?.map((prop: TaskDataType) => prop?.taskStatus);
-    // const filteredTasks = tasks_?.filter((prop: TaskDataType) => prop?.taskStatus === selectedCategory)
+
     console.log(extractCategories, "pppppppppppppppp", )
     return (
         <div>
@@ -40,10 +38,10 @@ const TaskListModule = () => {
             </div>
             <NavigationContent 
                 listClass='grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3'
-                buttonList={ taskStatus }
+                buttonList={ extractCategories }
             >
-                {filteredTasks?.map((task: TaskDataType) => (
-                    <TaskDetailCard key={task?.id} task={task} />
+                {filteredTasksFromBackend?.map((task: TaskDataType) => (
+                    <TaskDetailCard key={task?._id} task={task} />
                 ))}
             </NavigationContent>
             {/* <TaskList itemsFilterList={extractCategories} itemsList={tasks} /> */}

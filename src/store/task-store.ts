@@ -15,11 +15,12 @@ interface TaskState {
   selectedTasks: TaskDataType[]; // Array of selected tasks
   selectedCategory?: string; // Array of selected tasks
   filteredTasks?: TaskDataType[]; // Array of selected tasks
+  filteredTasksFromBackend?: TaskDataType[]; // Array of selected tasks
   setTasks: (tasks_: TaskDataType[]) => void; // Load all tasks
   toggleTaskSelection: (id: number | string, numberOfTaskPerDay: number) => void; // Add or remove a task from the selection
   toggleTaskSelectionV2: (id: number | string, numberOfTaskPerDay: number, userId: string) => void; // Add or remove a task from the selection
   setSelectedTaskFromBack: (filteredTasks: any) => void;
-  toggleCategory: (category: string) => void; 
+  toggleCategory: (category: string, taskAssignment: TaskDataType[]) => void; 
   clearTaskSelection: () => void; // Clear all selected tasks
   selectTask: (id: number | string) => void; // Select a specific task by ID
   submitTask: () => void; // Mark the selected task as submitted
@@ -33,6 +34,7 @@ export const useTaskStore = create<TaskState>()(
         filteredTasks: get()?.filteredTasks || [], // Initialize filteredtasks
         selectedTask: null, // No task selected by default
         selectedTasks: get()?.selectedTasks || [], // Array of selected tasks
+        filteredTasksFromBackend: get()?.filteredTasksFromBackend || [],
 
         // Load all tasks
         setTasks: (tasks) =>
@@ -49,12 +51,13 @@ export const useTaskStore = create<TaskState>()(
           }),
 
         // Load all tasks
-        setSelectedTaskFromBack: (filteredTasks: any) =>
+        setSelectedTaskFromBack: (filteredTasksFromBackend: any) =>
           set((state) => {
-            console.log(filteredTasks, "in the store==============>")
+            console.log(filteredTasksFromBackend, "in the store==============>")
             return {
               ...state,
-              filteredTasks,
+              filteredTasksFromBackend,
+              filteredTasks: filteredTasksFromBackend, 
             };
           }),
 
@@ -81,76 +84,141 @@ export const useTaskStore = create<TaskState>()(
             ),
           })),
 
+        // toggleTaskSelectionV2: async (id: any, maxTasks: any, userId: any) => {
+        //   const taskIndex = get().tasks_.findIndex((task) => task._id === id);
+        //   if (taskIndex === -1) return; // Task not found
+
+        //   const task = get().tasks_[taskIndex];
+        //   const isSelected = !task.isSelected;
+
+        //   // console.log(get().selectedTasks, isSelected, 'hellooooouuuuuuu');
+
+        //   // Check the maxTasks limit
+        //   if (isSelected && get().selectedTasks.length >= maxTasks) {
+        //     alert(`You can only select up to ${maxTasks} tasks per day.`);
+        //     return;
+        //   }
+
+        //   try {
+        //     if (isSelected) {
+        //       // // Unassign task by calling the DELETE endpoint
+        //       const data = await fetch(`${BASE_API_URL}/task-assignment/assign`, {
+        //         method: 'POST',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify({ userId, taskId: id }),
+        //       });
+      
+        //       // Update state after successful request
+        //       set((state) => {
+        //         const updatedTasks = state.tasks_.map((t) =>
+        //           t._id === id ? { ...t, isSelected: true } : t
+        //         );
+      
+        //         // const updatedSelectedTasks = state.selectedTasks.filter(
+        //         //   (t) => t._id !== id
+        //         // );
+        //         const updatedSelectedTasks = isSelected
+        //         ? [...state.selectedTasks, { ...task, isSelected }]
+        //         : state.selectedTasks.filter((t) => t._id !== id);
+      
+        //         return { tasks_: updatedTasks, selectedTasks: updatedSelectedTasks };
+        //       });
+        //     } else {
+        //       // // Unassign task by calling the DELETE endpoint
+        //       const data = await fetch(`${BASE_API_URL}/task-assignment/unassign`, {
+        //         method: 'DELETE',
+        //         headers: { 'Content-Type': 'application/json' },
+        //         body: JSON.stringify({ userId, taskId: id }),
+        //       });
+      
+        //       // Update state after successful request
+        //       set((state) => {
+        //         const updatedTasks = state.tasks_.map((t) =>
+        //           t._id === id ? { ...t, isSelected: false } : t
+        //         );
+      
+        //         // const updatedSelectedTasks = [
+        //         //   ...state.selectedTasks,
+        //         //   { ...task, isSelected: true },
+        //         // ];
+        //         const updatedSelectedTasks = isSelected
+        //         ? [...state.selectedTasks, { ...task, isSelected }]
+        //         : state.selectedTasks.filter((t) => t._id !== id);
+
+        //         return { tasks_: updatedTasks, selectedTasks: updatedSelectedTasks };
+        //       });
+              
+        //     }
+        //   } catch (error: any) {
+        //     console.error(error.message);
+        //     alert('Failed to update task selection. Please try again.');
+        //   }
+        // },
+
+
         toggleTaskSelectionV2: async (id: any, maxTasks: any, userId: any) => {
           const taskIndex = get().tasks_.findIndex((task) => task._id === id);
           if (taskIndex === -1) return; // Task not found
-
+        
           const task = get().tasks_[taskIndex];
           const isSelected = !task.isSelected;
-
-          // console.log(get().selectedTasks, isSelected, 'hellooooouuuuuuu');
-
+        
           // Check the maxTasks limit
           if (isSelected && get().selectedTasks.length >= maxTasks) {
             alert(`You can only select up to ${maxTasks} tasks per day.`);
             return;
           }
-
+        
           try {
-            if (isSelected) {
-              // // Unassign task by calling the DELETE endpoint
-              const data = await fetch(`${BASE_API_URL}/task-assignment/assign`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, taskId: id }),
-              });
-      
-              // Update state after successful request
-              set((state) => {
-                const updatedTasks = state.tasks_.map((t) =>
-                  t._id === id ? { ...t, isSelected: true } : t
+            const endpoint = isSelected
+              ? `${BASE_API_URL}/task-assignment/assign`
+              : `${BASE_API_URL}/task-assignment/unassign`;
+            const method = isSelected ? 'POST' : 'DELETE';
+        
+            // Assign or unassign task via API call
+            const data = await fetch(endpoint, {
+              method,
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ userId, taskId: id }),
+            });
+        
+            if (!data.ok) throw new Error('API request failed');
+        
+            // Update state after successful API call
+            set((state) => {
+              const updateTaskSelection = (tasks: any[]) =>
+                tasks.map((t) =>
+                  t._id === id ? { ...t, isSelected } : t
                 );
-      
-                // const updatedSelectedTasks = state.selectedTasks.filter(
-                //   (t) => t._id !== id
-                // );
-                const updatedSelectedTasks = isSelected
+              const updateTaskSelection2 = (tasks: any[]) => isSelected ? 
+                tasks.map((t) =>
+                  t._id === id ? { ...t, isSelected } : t
+                ) : 
+                tasks?.filter((t) => t._id !== id);
+        
+              const updatedTasks = updateTaskSelection(state.tasks_);
+              const updatedFilteredTasks = updateTaskSelection2(state?.filteredTasks!);
+              const updatedFilteredTasksFromBackend = updateTaskSelection2(
+                state?.filteredTasksFromBackend!
+              );
+        
+              const updatedSelectedTasks = isSelected
                 ? [...state.selectedTasks, { ...task, isSelected }]
                 : state.selectedTasks.filter((t) => t._id !== id);
-      
-                return { tasks_: updatedTasks, selectedTasks: updatedSelectedTasks };
-              });
-            } else {
-              // // Unassign task by calling the DELETE endpoint
-              const data = await fetch(`${BASE_API_URL}/task-assignment/unassign`, {
-                method: 'DELETE',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ userId, taskId: id }),
-              });
-      
-              // Update state after successful request
-              set((state) => {
-                const updatedTasks = state.tasks_.map((t) =>
-                  t._id === id ? { ...t, isSelected: false } : t
-                );
-      
-                // const updatedSelectedTasks = [
-                //   ...state.selectedTasks,
-                //   { ...task, isSelected: true },
-                // ];
-                const updatedSelectedTasks = isSelected
-                ? [...state.selectedTasks, { ...task, isSelected }]
-                : state.selectedTasks.filter((t) => t._id !== id);
-
-                return { tasks_: updatedTasks, selectedTasks: updatedSelectedTasks };
-              });
-              
-            }
+        
+              return {
+                tasks_: updatedTasks,
+                filteredTasks: updatedFilteredTasks,
+                filteredTasksFromBackend: updatedFilteredTasksFromBackend,
+                selectedTasks: updatedSelectedTasks,
+              };
+            });
           } catch (error: any) {
             console.error(error.message);
             alert('Failed to update task selection. Please try again.');
           }
         },
+        
 
 
         // Add or remove a task from the selection
@@ -203,14 +271,24 @@ export const useTaskStore = create<TaskState>()(
         },
 
         // Add or remove a task from the selection
-        toggleCategory: (category: string) =>
+        toggleCategory: (category: string, taskAssignment: TaskDataType[]) =>
           set((state) => {
-            let updatedSelectedTasks = state?.selectedTasks?.filter((task) => task?.taskStatus === category);
+            let updatedSelectedTasks = state?.filteredTasks?.filter((task) => task?.status === category);
             if (category === "Toutes") {
-              updatedSelectedTasks = state?.tasks_
+              updatedSelectedTasks = state?.filteredTasksFromBackend!
             }
             return { ...state, filteredTasks: updatedSelectedTasks, selectedCategory: category };
           }),
+
+        // // Add or remove a task from the selection
+        // toggleCategory: (category: string) =>
+        //   set((state) => {
+        //     let updatedSelectedTasks = state?.selectedTasks?.filter((task) => task?.taskStatus === category);
+        //     if (category === "Toutes") {
+        //       updatedSelectedTasks = state?.tasks_
+        //     }
+        //     return { ...state, filteredTasks: updatedSelectedTasks, selectedCategory: category };
+        //   }),
 
         // Clear all selected tasks
         clearTaskSelection: () =>
@@ -247,6 +325,7 @@ export const useTaskStore = create<TaskState>()(
         selectedTasks: state.selectedTasks,
         selectedCategory: state.selectedCategory,
         filteredTasks: state.filteredTasks,
+        filteredTasksFromBackend: state.filteredTasksFromBackend
       }), // Only persist relevant state
     }
   )

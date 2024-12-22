@@ -7,7 +7,7 @@ import TaskListModule from './_components/TaskListModule';
 
 const TaskListPage = () => {
   return (
-    <div>
+    <div className='mb-[5rem]'>
         <Breadcrumb pageName="Liste des taches" />
         <ReturnHeader
             headerName=' '

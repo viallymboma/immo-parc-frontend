@@ -20,6 +20,7 @@ const useFetchTasks = () => {
     const { data: tasksDataSet, error, isValidating, mutate } = useSWR(`${BASE_API_URL}/tasks/users-tasks`, fetcher, {
         onSuccess: (tasks) => {
             // Update Zustand store when data is fetched
+            console.log("here in useFetchTasks onSuccess", tasks)
             setTasks(tasks || []);
         },
         refreshInterval: 0, // Disable periodic revalidation

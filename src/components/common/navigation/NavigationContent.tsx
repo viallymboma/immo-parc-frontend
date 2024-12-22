@@ -1,6 +1,7 @@
 "use client";
 import React from 'react';
 
+import useFetchTaskAssigments from '@/hooks/useFetchTaskAssigment';
 import { useTaskStore } from '@/store/task-store';
 
 import NavigateCategories from './NavigateCategories';
@@ -19,6 +20,8 @@ const NavigationContent = ({
     const categories = [...buttonList ]
     const [selectedCategory, setSelectedCategory] = React.useState<any>("All");
     const { toggleCategory,  } = useTaskStore();
+    const { taskAssignment } = useFetchTaskAssigments ()
+    console.log(taskAssignment, "for categories=====>")
     return (
         <div className="p-4">
             <NavigateCategories>
@@ -27,7 +30,7 @@ const NavigationContent = ({
                         key={category}
                         onClick={() => {
                             setSelectedCategory(category)
-                            toggleCategory (category)
+                            toggleCategory (category, taskAssignment)
                         }}
                         className={`py-2 px-4 whitespace-nowrap ${
                             selectedCategory === category

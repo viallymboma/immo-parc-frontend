@@ -6,6 +6,7 @@ import mongoose, { Model } from 'mongoose';
 import { ITask } from '../models/Task';
 import { ITaskAssignment } from '../models/TaskAssignment';
 import { IUser } from '../models/User';
+import TaskSchedulerService from './task-assignment-schedul';
 
 export class TaskAssignmentService {
   private taskAssignmentModel: Model<ITaskAssignment>;
@@ -83,8 +84,11 @@ export class TaskAssignmentService {
     //   throw new Error('Task not available for assignment.');
     // }
 
-    const assignment = new this.taskAssignmentModel({ user: user._id, task: task?._id });
+    const assignment: any = new this.taskAssignmentModel({ user: user._id, task: task?._id });
     await assignment.save();
+
+    // Schedule status update for this assignment
+    TaskSchedulerService.scheduleTaskStatusUpdate(assignment?._id?.toString());
 
     // task.taskStatus = 'assigned';
     // await task.save();
@@ -125,7 +129,42 @@ export class TaskAssignmentService {
   
     return taskAssignment;
   }
+
+  async updateTaskAssignmentStatusToInProgress(taskAssignmentId: string): Promise<ITaskAssignment> {
+    const taskAssignment = await this.taskAssignmentModel.findById(taskAssignmentId);
   
+    if (!taskAssignment) {
+      throw new Error('Task assignment not found');
+    }
+  
+    if (taskAssignment.status === 'in-progress') {
+      return taskAssignment; // No need to update if already in progress
+    }
+  
+    taskAssignment.status = 'in-progress';
+    taskAssignment.startTime = `${new Date()}`; // Set the start time
+    await taskAssignment.save();
+  
+    return taskAssignment;
+  }
+  
+  // async updateTaskAssignmentStatus(taskAssignmentId: string): Promise<ITaskAssignment> {
+  //   const taskAssignment = await this.taskAssignmentModel.findById(taskAssignmentId);
+  
+  //   if (!taskAssignment) {
+  //     throw new Error('Task assignment not found');
+  //   }
+  
+  //   if (taskAssignment.status === 'in-progress') {
+  //     return taskAssignment; // No need to update if already in progress
+  //   }
+  
+  //   taskAssignment.status = 'in-progress';
+  //   taskAssignment.startTime = `${new Date()}`; // Set the start time
+  //   await taskAssignment.save();
+  
+  //   return taskAssignment;
+  // }
 }
 
 

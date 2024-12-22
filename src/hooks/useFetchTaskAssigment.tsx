@@ -16,7 +16,8 @@ const useFetchTaskAssigments = () => {
     const { data, error, isValidating } = useSWR(`${BASE_API_URL}/task-assignment/user-tasks`, fetcher, {
         onSuccess: (taskAssignments) => {
             // TRANSFORM DATA HERE 
-            const transformTask = taskAssignments.map((task: any) => {
+            console.log("here in useFetchTaskAssigments onSuccess", taskAssignments)
+            const transformTask = taskAssignments?.tasks?.map((task: any) => {
                 return {
                     ...task.task, 
                     status: task?.status, 

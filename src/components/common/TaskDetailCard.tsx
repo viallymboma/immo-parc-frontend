@@ -27,7 +27,7 @@ type TaskDetailCardProps = {
 };
 
 const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
-    const { submitTask } = task;
+    // const { submitTask } = task;
     const [selectedImage, setSelectedImage] = React.useState<File | null>(null); // State for storing the selected image
     const [uploading, setUploading] = React.useState(false);
 
@@ -45,13 +45,6 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
         }
     };
 
-    // const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
-    //     const file = event.target.files?.[0];
-    //     if (file) {
-    //         setSelectedImage(file);
-    //     }
-    // };
-
     const handleImageUpload = async () => {
         if (!selectedImage) return;
 
@@ -59,9 +52,10 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
 
         const formData = new FormData();
         formData.append('image', selectedImage);
+        formData.append('taskAssignmentId', task?.taskAssignmentId || ""); // Add taskAssignmentId
 
         try {
-            const response = await fetch('/api/upload', {
+            const response = await fetch('/api/cloudinary-upload', {
                 method: 'POST',
                 body: formData,
             });
@@ -100,10 +94,13 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
 
                 <div className="flex items-center justify-between">
 
+                { task?.status === "completed" ? 
+                    null
+                    :
                     <div className="flex items-center space-x-2">
                         <label
                             htmlFor="imageUpload"
-                            className="flex items-center space-x-2 cursor-pointer"
+                            className={`flex items-center space-x-2 cursor-pointer`}
                         >
                             <input
                                 id="imageUpload"
@@ -117,12 +114,6 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                                         setSelectedImage(file);
                                     }
                                 }}
-                                // onChange={(e) => {
-                                //     const file = e.target.files?.[0];
-                                //     if (file) {
-                                //         alert(`Selected file: ${file.name}`); // Handle file selection
-                                //     }
-                                // }}
                             />
                             <div className="w-5 h-5 text-yellow-400">
                                 <Camera className="w-full h-full" />
@@ -130,6 +121,8 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                             <span className="text-sm font-medium text-gray-600">Upload Image</span>
                         </label>
                     </div>
+                }
+
 
                     <div className="text-xl font-bold text-red-500">XOF : {task?.packageId?.priceEarnedPerTaskDone }</div>
                 </div>
@@ -230,11 +223,17 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                         <span className="ml-3 text-sm text-gray-600">Service</span>
                     </div>
                     <Button
-                        onClick={submitTask}
-                        disabled={task?.status === "pending" ? true : task?.status === "in-progress" ? false : true } // in-progress
-                        className={`${task?.status === "pending" ? "bg-slate-400 cursor-not-allowed hover:bg-slate-400" : "bg-yellow-500 hover:bg-yellow-600" }  text-white px-6`}
-                    >
-                        {task?.isSubmitted ? 'Soumis' : 'Soumettre'}
+                        onClick={handleImageUpload}
+                        disabled={
+                            task?.status === "pending" || uploading
+                        } // Disable if in "pending" state or upload is happening
+                        className={`${
+                            task?.status === "pending" || uploading
+                            ? "bg-slate-400 cursor-not-allowed hover:bg-slate-400"
+                            : "bg-yellow-500 hover:bg-yellow-600"
+                        } text-white px-6 py-2 rounded`}
+                        >
+                        {uploading ? "En cour..." : "Soumettre"}
                     </Button>
                 </div>
             </CardFooter>

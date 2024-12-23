@@ -66,6 +66,10 @@ const BackofficeModule = () => {
     });
   }
 
+  const intermediateObjects = replaceById(tasks_, filteredTasksFromBackend);
+
+  console.log(intermediateObjects, "before all")
+
   // const intermediateObjects = tasks_.map((task: TaskDataType) => {
   //   let findSelectedTaskInBn;
   //   if (filteredTasksFromBackend && filteredTasksFromBackend?.length > 0) {
@@ -121,7 +125,7 @@ const BackofficeModule = () => {
           <h1 className='text-primary text-[20px] font-bold'>Tâches pour aujourd'hui</h1>
         </div>
         <div className='grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-3 gap-3'>
-          {tasks_?.map((property: TaskDataType) => {
+          {intermediateObjects?.map((property: TaskDataType) => {
             return (
                 <div key={ property?._id } className='flex flex-row gap-1 items-center justify-between dark:bg-[#122031] bg-white shadow-lg rounded-lg  max-w-sm'>
                     <TaskCardStyled task={ property } />

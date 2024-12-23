@@ -69,7 +69,7 @@ const TaskCardStyled: React.FC<TaskCardType> = ({ task }) => {
                     console.log("Toggled task ID:", task?._id); // Debugging log
                   }}
                 />
-                <div className={`w-10 h-10 flex items-center justify-center rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 ${ task?.isSelected ? "bg-yellow-500" : "bg-transparent" } hover:text-white transition duration-300`}>
+                <div className={`w-10 h-10 flex items-center justify-center rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 ${ task?.status ? "bg-yellow-500" : "bg-transparent" } hover:text-white transition duration-300`}>
                     {/* Add any icon or content here */}
                     <svg
                       xmlns="http://www.w3.org/2000/svg"

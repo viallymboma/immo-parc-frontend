@@ -195,6 +195,8 @@ export const useTaskStore = create<TaskState>((set, get) => {
         if (!data.ok){ 
           alert(response?.error)
           throw new Error('API request failed'); 
+        } else {
+          alert(response?.message)
         };
 
         // Update state after successful API call

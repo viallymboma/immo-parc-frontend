@@ -131,7 +131,12 @@ export class TaskAssignmentService {
   }
 
   async updateTaskAssignmentStatusToInProgress(taskAssignmentId: string): Promise<ITaskAssignment> {
+    
+    console.log("taskAssignmentId", taskAssignmentId); 
+
     const taskAssignment = await this.taskAssignmentModel.findById(taskAssignmentId);
+
+    console.log("taskAssignment before", taskAssignment); 
   
     if (!taskAssignment) {
       throw new Error('Task assignment not found');
@@ -144,7 +149,35 @@ export class TaskAssignmentService {
     taskAssignment.status = 'in-progress';
     taskAssignment.startTime = `${new Date()}`; // Set the start time
     await taskAssignment.save();
+
+    console.log("taskAssignment after", taskAssignment); 
   
+    return taskAssignment;
+  }
+
+
+  /**
+   * Updates the picture and status of a TaskAssignment.
+   * @param taskAssignmentId - ID of the task assignment to update
+   * @param picture - Object containing Cloudinary image details (name, public_id, url)
+   * @returns Updated task assignment
+   */
+  async updateTaskAssignmentWithPicture(
+    taskAssignmentId: string,
+    picture: { name: string; public_id: string; url: string }
+  ): Promise<ITaskAssignment> {
+    const taskAssignment = await this.taskAssignmentModel.findById(taskAssignmentId);
+
+    if (!taskAssignment) {
+      throw new Error('Task assignment not found');
+    }
+
+    // Update the picture and mark the status as 'completed'
+    taskAssignment.picture = picture;
+    taskAssignment.status = 'completed';
+    taskAssignment.endTime = `${new Date()}`; // Set the end time
+    await taskAssignment.save();
+
     return taskAssignment;
   }
   

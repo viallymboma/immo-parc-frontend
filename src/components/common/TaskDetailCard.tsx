@@ -28,7 +28,11 @@ type TaskDetailCardProps = {
 
 const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
     const { submitTask } = task;
-    console.log(task, "the task....")
+    const [selectedImage, setSelectedImage] = React.useState<File | null>(null); // State for storing the selected image
+    const [uploading, setUploading] = React.useState(false);
+
+    console.log(task, "the task...."); 
+
     const router = useRouter ()
     // Function to copy the URL to clipboard
     const copyToClipboard = async () => {
@@ -40,6 +44,43 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
             alert("Failed to copy URL");
         }
     };
+
+    // const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    //     const file = event.target.files?.[0];
+    //     if (file) {
+    //         setSelectedImage(file);
+    //     }
+    // };
+
+    const handleImageUpload = async () => {
+        if (!selectedImage) return;
+
+        setUploading(true);
+
+        const formData = new FormData();
+        formData.append('image', selectedImage);
+
+        try {
+            const response = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to upload image');
+            }
+
+            const result = await response.json();
+            alert('Image uploaded successfully!');
+            console.log(result); // Contains the server response
+        } catch (error) {
+            console.error(error);
+            alert('Error uploading image');
+        } finally {
+            setUploading(false);
+        }
+    };
+
     return (
         <Card className="w-full max-w-xl bg-white rounded-xl shadow-lg overflow-hidden">
             <CardHeader className="space-y-4 p-6">
@@ -69,12 +110,19 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                                 type="file"
                                 accept="image/*"
                                 className="hidden" // Hide the input visually
+                                // onChange={handleImageUpload}
                                 onChange={(e) => {
                                     const file = e.target.files?.[0];
                                     if (file) {
-                                        alert(`Selected file: ${file.name}`); // Handle file selection
+                                        setSelectedImage(file);
                                     }
                                 }}
+                                // onChange={(e) => {
+                                //     const file = e.target.files?.[0];
+                                //     if (file) {
+                                //         alert(`Selected file: ${file.name}`); // Handle file selection
+                                //     }
+                                // }}
                             />
                             <div className="w-5 h-5 text-yellow-400">
                                 <Camera className="w-full h-full" />
@@ -85,6 +133,33 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
 
                     <div className="text-xl font-bold text-red-500">XOF : {task?.packageId?.priceEarnedPerTaskDone }</div>
                 </div>
+                {/* Display the selected image */}
+                {selectedImage && (
+                <div className="mt-4 flex items-center space-x-2">
+                    {/* Small Image Preview */}
+                    <img
+                        src={URL.createObjectURL(selectedImage)}
+                        alt="Selected"
+                        className="w-12 h-12 object-cover rounded-md shadow-md"
+                    />
+                    {/* Clear Button */}
+                    <button
+                        onClick={() => {
+                            setSelectedImage(null);
+                            // Reset the input value to allow selecting the same image again
+                            const input = document.getElementById(
+                                'imageUpload'
+                            ) as HTMLInputElement;
+                            if (input) {
+                                input.value = '';
+                            }
+                        }}
+                        className="text-sm text-red-500 hover:underline"
+                    >
+                        Clear
+                    </button>
+                </div>
+            )}
             </CardHeader>
 
             <Separator />
@@ -99,30 +174,36 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                     <div className="flex items-center justify-between text-sm text-gray-500">
                         <span>Audit :</span>
                         <Button 
-                        onClick={async () => {
+                            onClick={async () => {
                             // router.push(`${ task?.taskLink }`)
-                            if (task?.taskLink) {
-                                window.open(task.taskLink, '_blank');
+                                if (task?.taskLink) {
+                                    window.open(task.taskLink, '_blank');
 
-                                // Call the API to update the status
-                                const response = await fetch(`${BASE_API_URL}/task-assignment/update-status`, {
-                                    method: 'POST',
-                                    headers: {
-                                        'Content-Type': 'application/json',
-                                    },
-                                    body: JSON.stringify({ taskAssignmentId: task?.id }), // Adjust based on task ID field
+                                    console.log("BEFORE EXECUTING REQUEST"); 
+
+                                    // Call the API to update the status
+                                    const response = await fetch(`${BASE_API_URL}/task-assignment/update-status`, {
+                                        method: 'POST',
+                                        headers: {
+                                            'Content-Type': 'application/json',
+                                        },
+                                        body: JSON.stringify({ taskAssignmentId: task?.taskAssignmentId }), // Adjust based on task ID field
                                     });
+
+                                    console.log("AFTER EXECUTING REQUEST"); 
 
                                     const result = await response.json();
 
                                     if (!response.ok) {
-                                    throw new Error(result.error || 'Failed to update task status');
+                                        throw new Error(result.error || 'Failed to update task status');
                                     }
 
+                                    console.log("AFTER REQUEST STATUS REQUEST"); 
+
                                     alert('Task status updated to in-progress');
-                            }
-                        }}
-                        variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700">
+                                }
+                            }}
+                            variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700">
                             <ExternalLink className="w-4 h-4 mr-1" />
                             Ouvrir le lien
                         </Button>
@@ -150,8 +231,8 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                     </div>
                     <Button
                         onClick={submitTask}
-                        disabled={task?.isSubmitted}
-                        className="bg-yellow-500 hover:bg-yellow-600 text-white px-6"
+                        disabled={task?.status === "pending" ? true : task?.status === "in-progress" ? false : true } // in-progress
+                        className={`${task?.status === "pending" ? "bg-slate-400 cursor-not-allowed hover:bg-slate-400" : "bg-yellow-500 hover:bg-yellow-600" }  text-white px-6`}
                     >
                         {task?.isSubmitted ? 'Soumis' : 'Soumettre'}
                     </Button>

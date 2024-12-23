@@ -193,7 +193,8 @@ export type TaskDataType = {
     createdAt?: string; // Optional field
     isSelected?: boolean; // New property to indicate selection state
     isSubmitted: boolean;
-    packageId?: PackageObjectType,
+    packageId?: PackageObjectType;
+    taskAssignmentId?: string;
     submitTask?: () => void;
     // id: number | string, 
     // taskTitle?: string, 

@@ -11,11 +11,15 @@ export async function POST(request: NextRequest) {
     try {
         const { taskAssignmentId } = await request.json();
 
+        console.log("taskAssignment after", taskAssignmentId); 
+
         if (!taskAssignmentId) {
             return NextResponse.json({ error: 'Task assignment ID is required' }, { status: 400 });
         }
 
         const updatedTaskAssignment = await taskAssignmentService.updateTaskAssignmentStatusToInProgress(taskAssignmentId);
+
+        console.log("updatedTaskAssignment PASSED", taskAssignmentId); 
 
         return NextResponse.json({ message: 'Task status updated successfully', data: updatedTaskAssignment });
     } catch (error: any) {

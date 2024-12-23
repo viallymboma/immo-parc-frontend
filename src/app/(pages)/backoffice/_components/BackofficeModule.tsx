@@ -22,6 +22,7 @@ import {
   TaskDataType,
 } from '@/components/common/backbone/other_component/data';
 import TaskCardStyled from '@/components/common/TaskCard';
+import useFetchTaskAssigments from '@/hooks/useFetchTaskAssigment';
 import useFetchTasks from '@/hooks/useFetchTasks';
 import { useTaskStore } from '@/store/task-store';
 
@@ -40,11 +41,40 @@ const images = [
 
 const BackofficeModule = () => {
 
-  const { tasks_ } = useTaskStore(); 
-
-  console.log(tasks_, "uuuujjjj")
-
   const { tasksDataSet, error, isValidating } = useFetchTasks (); 
+  const { taskAssignment } = useFetchTaskAssigments ()
+
+  const { tasks_, filteredTasksFromBackend } = useTaskStore(); 
+
+  // const { tasks_, selectedCategory, filteredTasks, filteredTasksFromBackend, toggleCategory } = useTaskStore(); 
+
+  console.log(tasks_, "uuuujjjj", filteredTasksFromBackend); 
+
+  function replaceById(arr1: any, arr2: any) {
+    // Create a map of objects from arr2, indexed by _id
+    const map = arr2.reduce((acc: any, obj: any) => {
+        acc[obj._id] = obj;
+        return acc;
+    }, {});
+
+    // Replace the elements in arr1 with corresponding objects from arr2
+    return arr1.map((item: any) => {
+        if (map[item._id]) {
+            return map[item._id]; // Replace with matching object from arr2
+        }
+        return item; // Return the original item if no match is found
+    });
+  }
+
+  // const intermediateObjects = tasks_.map((task: TaskDataType) => {
+  //   let findSelectedTaskInBn;
+  //   if (filteredTasksFromBackend && filteredTasksFromBackend?.length > 0) {
+  //     findSelectedTaskInBn = filteredTasksFromBackend?.find(bnObj => task?._id === bnObj?._id)
+  //   }
+  //   return {
+  //     ...task, findSelectedTaskInBn
+  //   }
+  // })
 
   // if (isValidating) {
   //   return <div>Loading...</div>

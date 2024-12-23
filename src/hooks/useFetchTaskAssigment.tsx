@@ -16,14 +16,15 @@ const useFetchTaskAssigments = () => {
     const { data, error, isValidating } = useSWR(`${BASE_API_URL}/task-assignment/user-tasks`, fetcher, {
         onSuccess: (taskAssignments) => {
             // TRANSFORM DATA HERE 
-            console.log("here in useFetchTaskAssigments onSuccess", taskAssignments)
+            // console.log("here in useFetchTaskAssigments onSuccess", taskAssignments)
             const transformTask = taskAssignments?.tasks?.map((task: any) => {
                 return {
                     ...task.task, 
+                    taskAssignmentId: task?._id,
                     status: task?.status, 
                 }
             })
-            console.log(transformTask, "in the rquest")
+            // console.log(transformTask, "in the rquest")
             // Update Zustand store when data is fetched
             setSelectedTaskFromBack(transformTask || []);
         },
@@ -32,11 +33,12 @@ const useFetchTaskAssigments = () => {
         revalidateOnReconnect: false,
     });
 
-    console.log(data?.tasks, "eeeeeeeeeeeeeeeeeeee")
+    // console.log(data?.tasks, "eeeeeeeeeeeeeeeeeeee")
 
     const transformTask = data?.tasks?.map((task: any) => {
         return {
             ...task?.task, 
+            taskAssignmentId: task?._id,
             status: task?.status, 
         }
     })

@@ -19,8 +19,6 @@ export async function connectToDatabase() {
   try {
     const { connection } = await mongoose.connect(MONGODB_URI, {
       dbName: 'immo_parc_db', // Specify the database name
-      // useNewUrlParser: true,
-      // useUnifiedTopology: true,
       serverSelectionTimeoutMS: 30000, // 10 seconds timeout
       socketTimeoutMS: 45000,         // 45 seconds for socket operations
     });

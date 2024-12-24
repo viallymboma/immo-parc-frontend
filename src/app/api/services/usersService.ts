@@ -35,7 +35,10 @@ export const usersService = {
     }
 
     const parent: any = parentId ? await this.findByPhone(parentId) : null;
-    if (!parent) throw new Error('Parent not found');
+    if (!parent) {
+      return { error: 'Numero du sponsor innexistant' };
+      // throw new Error('Parent not found')
+    };
 
     let pkg = null;
     if (packageId) {

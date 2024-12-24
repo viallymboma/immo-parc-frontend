@@ -140,9 +140,7 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                         onClick={() => {
                             setSelectedImage(null);
                             // Reset the input value to allow selecting the same image again
-                            const input = document.getElementById(
-                                'imageUpload'
-                            ) as HTMLInputElement;
+                            const input = document.getElementById('imageUpload') as HTMLInputElement;
                             if (input) {
                                 input.value = '';
                             }

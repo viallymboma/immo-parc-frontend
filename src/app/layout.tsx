@@ -9,6 +9,8 @@ import React, {
   useState,
 } from 'react';
 
+import { Toaster } from 'react-hot-toast';
+
 import Loader from '@/components/common/Loader';
 
 const RootLayout = ({ children }: Readonly<{ children: React.ReactNode; }>) => {
@@ -20,6 +22,10 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode; }>) => {
     return (
         <html lang="en">
             <body>
+                <Toaster 
+                    position="top-center"
+                    toastOptions={{ duration: 10000 }}
+                />
                 {loading ? <Loader /> : children}
             </body>
         </html>

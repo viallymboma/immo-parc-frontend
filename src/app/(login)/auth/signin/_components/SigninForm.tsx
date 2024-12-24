@@ -2,12 +2,16 @@
 "use client";
 import React from 'react';
 
+import { EyeOffIcon } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useForm } from 'react-hook-form';
+import toast from 'react-hot-toast';
 
+import { EyeSvgIcon } from '@/components/svgs/SvgIcons';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/hooks/useAuth';
+import { passwordRules } from '@/lib/constants';
 
 interface SigninFormValues {
   phone: string;
@@ -20,19 +24,41 @@ export default function SigninForm() {
   const router = useRouter();
   const { login } = useAuth();
 
-  // console.log(user, "uuuuuuuuuu")
+  const [ showPassword, setShowPassword ] = React.useState <boolean> (false)
+  const [password, setPassword] = React.useState("");
+  const [passwordValidations, setPasswordValidations] = React.useState({
+    minLength: false,
+    uppercase: false,
+    lowercase: false,
+    digit: false,
+    specialChar: false,
+  });
+
+  const validatePassword = (password: string) => {
+    setPasswordValidations({
+      minLength: password.length >= 8,
+      uppercase: /[A-Z]/.test(password),
+      lowercase: /[a-z]/.test(password),
+      digit: /\d/.test(password),
+      specialChar: /[!@#$%^&*()]/.test(password),
+    });
+  };
+  
+  const handlePasswordChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value;
+    setPassword(value);
+    validatePassword(value);
+  };
 
   const onSubmit = async (data: SigninFormValues) => {
     try {
       console.log(data, "datata")
-      const res = await login(data.phone, data.password);
+      await login(data.phone, data.password);
+      toast.success("Connexion reussit")
       router.push("/backoffice"); // Redirect after successful login
     } catch (err: any) {
       console.error("Login error:", err.message);
-      // Display login error in the UI
-      if (err.response?.status === 401) {
-        alert("Invalid credentials. Please try again.");
-      }
+      toast.error(err.message)
     }
   };
 
@@ -61,7 +87,7 @@ export default function SigninForm() {
       </div>
 
       {/* Password Field */}
-      <div className="mb-5">
+      <div className="mb-5 relative">
         <label
           htmlFor="password"
           className="mb-2.5 block font-medium text-dark dark:text-white"
@@ -70,20 +96,45 @@ export default function SigninForm() {
         </label>
         <div className="relative">
           <input
-            type="password"
+            // type="password"
+            type={ showPassword ? 'text' : 'password'}
             id="password"
             placeholder="Entrez votre mot de passe"
             className="w-full rounded-lg border border-stroke bg-transparent py-[15px] pl-6 pr-11 font-medium text-dark outline-none focus:border-primary focus-visible:shadow-none dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
-            {...register("password", { required: "Ce champ est obligatoire" })}
+            {...register("password", { 
+              required: "Ce champ est obligatoire", 
+              onChange(event) {
+                handlePasswordChange (event)
+              },
+            })}
           />
           {errors.password && (
             <span className="text-red-500 text-sm">{errors.password.message}</span>
           )}
         </div>
+        <div onClick={() => setShowPassword (showPassword => !showPassword)} className='absolute right-[5%] cursor-pointer top-[55%] rounded-full '>
+          { showPassword ? <EyeSvgIcon /> : <EyeOffIcon />}
+        </div>
+      </div>
+
+      {/* Password Validation Rules */}
+      <div className="mt-2 space-y-1 text-sm">
+        {Object.entries(passwordRules).map(([key, rule]) => (
+          <p
+            key={key}
+            className={`${
+              passwordValidations[key as keyof typeof passwordValidations]
+                ? "text-green-500"
+                : "text-gray-500"
+            }`}
+          >
+            {passwordValidations[key as keyof typeof passwordValidations] ? "✔" : "✘"} {rule}
+          </p>
+        ))}
       </div>
 
       {/* Remember Me Checkbox */}
-      <div className="mb-6 flex items-center justify-between gap-2 py-2">
+      <div className="mb-6 flex flex-col items-start justify-between gap-2 py-2">
         <label
           htmlFor="remember"
           className="flex cursor-pointer select-none items-center font-medium text-dark dark:text-white"
@@ -119,16 +170,6 @@ export default function SigninForm() {
         </Link>
       </div>
 
-      {/* Submit Button */}
-      {/* <div className="mb-4.5">
-        <Button
-          type="submit"
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90"
-        >
-          Se connecter
-        </Button>
-      </div> */}
-      {/* Submit Button */}
       <div className="mb-4.5">
         <Button
           type="submit"
@@ -140,12 +181,6 @@ export default function SigninForm() {
           {isSubmitting ? "Connexion en cours..." : "Se connecter"}
         </Button>
       </div>
-
-      {/* Loading/Success Indicators */}
-      {/* {isLoading && <p className="text-center text-blue-500">Chargement...</p>}
-      {isSubmitted && !isSubmitting && (
-        <p className="text-center text-green-500">Connexion réussie !</p>
-      )} */}
     </form>
   );
 

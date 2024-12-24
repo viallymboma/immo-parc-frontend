@@ -15,7 +15,8 @@ export function useAuth() {
             const response = await apiClient.post(`/auth/login`, { phone, password }, { withCredentials: true });
             return response.data;
         } catch (err: any) {
-            throw new Error(err.response?.data?.message || 'Login failed');
+            console.log(err, "in response catch")
+            throw new Error(err.response?.data?.error || 'Login failed');
         }
     };
 

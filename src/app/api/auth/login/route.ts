@@ -55,11 +55,11 @@ export async function POST(request: Request) {
     const errorMessage = error.message;
 
     if (errorMessage === 'Numero introuvable dans le system.') {
-      return NextResponse.json({ error: 'Numero introuvable dans le system.' }, { status: 404 });
+      return NextResponse.json({ error: 'Numero introuvable dans le system.' }, { status: 400 });
     }
 
     if (errorMessage === 'Incorrect password.') {
-      return NextResponse.json({ error: 'Mot de passe incorrect.' }, { status: 401 });
+      return NextResponse.json({ error: 'Mot de passe incorrect.' }, { status: 400 });
     }
 
     // Generic error handling
@@ -76,9 +76,9 @@ export async function GET(request: Request) {
     }
 
     const user = jwt.verify(token, JWT_SECRET);
-    return NextResponse.json({ message: 'Authenticated', user });
+    return NextResponse.json({ message: 'Vous etes connecté', user });
   } catch (error) {
-    return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+    return NextResponse.json({ error: "Session Terminée. Veillez vous connecter a nouveau s'il vous plait" }, { status: 401 });
   }
 }
 
@@ -92,9 +92,9 @@ export async function PATCH(request: Request) {
 
     const token = authHeader.split(' ')[1];
     const validToken = jwt.verify(token, JWT_SECRET);
-    return NextResponse.json({ valid: true, message: 'Token is valid', user: validToken });
+    return NextResponse.json({ valid: true, message: 'Session active. Bienvenu', user: validToken });
   } catch (error) {
-    return NextResponse.json({ error: 'Invalid or expired token' }, { status: 401 });
+    return NextResponse.json({ error: "Session Terminée. Veillez vous connecter a nouveau s'il vous plait" }, { status: 401 });
   }
 }
 

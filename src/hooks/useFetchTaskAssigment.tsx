@@ -13,7 +13,7 @@ const fetcher = async (url: string) => {
 
 const useFetchTaskAssigments = () => {
     const { setSelectedTaskFromBack } = useTaskStore();
-    const { data, error, isValidating } = useSWR(`${BASE_API_URL}/task-assignment/user-tasks`, fetcher, {
+    const { data, error, isValidating, mutate } = useSWR(`${BASE_API_URL}/task-assignment/user-tasks`, fetcher, {
         onSuccess: (taskAssignments) => {
             // TRANSFORM DATA HERE 
             // console.log("here in useFetchTaskAssigments onSuccess", taskAssignments)
@@ -33,6 +33,10 @@ const useFetchTaskAssigments = () => {
         revalidateOnReconnect: false,
     });
 
+    const refetchTaskAssignments = async () => {
+        await mutate(); // Revalidates the SWR cache
+    };
+
     // console.log(data?.tasks, "eeeeeeeeeeeeeeeeeeee")
 
     const transformTask = data?.tasks?.map((task: any) => {
@@ -48,6 +52,7 @@ const useFetchTaskAssigments = () => {
         taskAssignment: transformTask || [],
         error,
         isValidating,
+        refetchTaskAssignments,
     };
 };
 

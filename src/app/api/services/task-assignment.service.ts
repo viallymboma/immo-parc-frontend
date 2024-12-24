@@ -45,7 +45,7 @@ export class TaskAssignmentService {
   async assignTaskToUser(userId: string, taskId: string): Promise<ITaskAssignment> {
     const user: any = await this.userModel.findById(userId).populate('package');
     if (!user || !user.package) {
-      throw new Error('User or package not found');
+      throw new Error('Utilisateur ou package introuvable');
     }
 
     const { numberOfTaskPerDay } = user.package;
@@ -62,7 +62,7 @@ export class TaskAssignmentService {
     });
 
     if (existingAssignment) {
-      throw new Error('This task has already been assigned to you for today.');
+      throw new Error("Cette tâche vous a déjà été confiée pour aujourd'hui");
     }
 
     const tasksAssignedToday = await this.taskAssignmentModel.countDocuments({
@@ -72,7 +72,7 @@ export class TaskAssignmentService {
 
     if (tasksAssignedToday >= numberOfTaskPerDay) {
       throw new Error(
-        `Task limit reached. You can only select ${numberOfTaskPerDay} tasks per day.`
+        `Limite de tâches atteinte. Vous ne pouvez sélectionner que ${numberOfTaskPerDay} tâches par jour.`
       );
     }
 
@@ -131,30 +131,19 @@ export class TaskAssignmentService {
   }
 
   async updateTaskAssignmentStatusToInProgress(taskAssignmentId: string): Promise<ITaskAssignment> {
-    
-    console.log("taskAssignmentId", taskAssignmentId); 
-
     const taskAssignment = await this.taskAssignmentModel.findById(taskAssignmentId);
-
-    console.log("taskAssignment before", taskAssignment); 
-  
     if (!taskAssignment) {
-      throw new Error('Task assignment not found');
+      throw new Error('Affectation de tâche introuvable');
     }
-  
     if (taskAssignment.status === 'in-progress') {
       return taskAssignment; // No need to update if already in progress
     }
-  
     taskAssignment.status = 'in-progress';
     taskAssignment.startTime = `${new Date()}`; // Set the start time
     await taskAssignment.save();
 
-    console.log("taskAssignment after", taskAssignment); 
-  
     return taskAssignment;
   }
-
 
   /**
    * Updates the picture and status of a TaskAssignment.
@@ -180,82 +169,5 @@ export class TaskAssignmentService {
 
     return taskAssignment;
   }
-  
-  // async updateTaskAssignmentStatus(taskAssignmentId: string): Promise<ITaskAssignment> {
-  //   const taskAssignment = await this.taskAssignmentModel.findById(taskAssignmentId);
-  
-  //   if (!taskAssignment) {
-  //     throw new Error('Task assignment not found');
-  //   }
-  
-  //   if (taskAssignment.status === 'in-progress') {
-  //     return taskAssignment; // No need to update if already in progress
-  //   }
-  
-  //   taskAssignment.status = 'in-progress';
-  //   taskAssignment.startTime = `${new Date()}`; // Set the start time
-  //   await taskAssignment.save();
-  
-  //   return taskAssignment;
-  // }
 }
 
-
-// export const  getTasksForUser = async (userId: string): Promise<ITaskAssignment[]> => {
-//   const today = new Date();
-//   const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-//   const endOfDay = new Date(today.setHours(23, 59, 59, 999));
-
-//   const taskAssignments = await TaskAssignment
-//     .find({
-//       user: userId,
-//       createdAt: { $gte: startOfDay, $lte: endOfDay }, // Filter by today's date
-//     })
-//     .populate('task')
-//     .populate({
-//       path: 'packageId',
-//     });
-
-//   return taskAssignments;
-// }
-
-
-// export const assignTaskToUser = async (userId: string, taskId: string): Promise<ITaskAssignment> => {
-//   const user: any = await User.findById(userId).populate('package');
-//   if (!user || !user.package) {
-//     throw new Error('User or package not found');
-//   }
-
-//   const { numberOfTaskPerDay } = user.package;
-
-//   const today = new Date();
-//   const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-//   const endOfDay = new Date(today.setHours(23, 59, 59, 999));
-
-//   const tasksAssignedToday = await this.taskAssignmentModel.countDocuments({
-//     user: user._id,
-//     createdAt: { $gte: startOfDay, $lte: endOfDay },
-//   });
-
-//   if (tasksAssignedToday >= numberOfTaskPerDay) {
-//     throw new Error(
-//       `Task limit reached. You can only select ${numberOfTaskPerDay} tasks per day.`
-//     );
-//   }
-
-//   const task = await this.taskModel.findById(taskId);
-//   if (!task || task.taskStatus !== 'unassigned') {
-//     throw new Error('Task not available for assignment.');
-//   }
-
-//   const assignment = new this.taskAssignmentModel({ user: user._id, task: task._id });
-//   await assignment.save();
-
-//   task.taskStatus = 'assigned';
-//   await task.save();
-
-//   user.selectedTasksCount += 1;
-//   await user.save();
-
-//   return assignment;
-// }

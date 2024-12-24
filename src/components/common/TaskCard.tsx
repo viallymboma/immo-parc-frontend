@@ -11,10 +11,10 @@ import { useTaskStore } from '@/store/task-store';
 import { TaskDataType } from './backbone/other_component/data';
 
 type TaskCardType = {
-  task: TaskDataType
-}
-
-const TaskCardStyled: React.FC<TaskCardType> = ({ task }) => {
+  task: TaskDataType;
+  onRefresh: () => void; // Callback to trigger refresh
+};
+const TaskCardStyled: React.FC<TaskCardType> = ({ task, onRefresh }) => {
 
   const router = useRouter ()
 
@@ -23,8 +23,6 @@ const TaskCardStyled: React.FC<TaskCardType> = ({ task }) => {
   const numberOfTaskPerDay = user?.userInfo?.package?.numberOfTaskPerDay || 0;
 
   const { toggleTaskSelectionV2  } = useTaskStore();
-
-  // console.log(task?.isSelected, "hellonothing========>", numberOfTaskPerDay)
 
   return (
     <>
@@ -40,60 +38,62 @@ const TaskCardStyled: React.FC<TaskCardType> = ({ task }) => {
         </div>
       {/* Right Section with Button */}
         <div className='flex flex-row h-[90px]  items-center'>
-            <div className=''
-              onClick={ () => {
-                // selectTask (task?._id as string); 
-                router?.push(`/backoffice/task-list/${ task?._id }`)
-              }}
-            >
-              {/* <p className="text-sm font-bold">Demande: {task.taskTitle}</p> */}
-              <p className="text-sm font-bold">{task.taskShortInstruction}</p>
-              {/* <p className="text-sm text-gray-700 overflow-hidden text-ellipsis whitespace-normal line-clamp-2">{task.taskDescription}</p> */}
-              {/* <p className="text-lg font-semibold text-primary mt-2">XOF {task.taskRemuneration}</p> */}
-              <p className="text-lg font-semibold text-primary mt-2">XOF {task.packageId?.priceEarnedPerTaskDone}</p>
-            </div>
 
-            <div className='flex items-center justify-center w-[100px] h-[100px]'>
-              <label
-                htmlFor={`task-${task._id}`}
-                className="flex items-center space-x-2 cursor-pointer"
-              >
-                <input
-                  id={`task-${task?._id}`} // Unique ID for each checkbox
-                  type="checkbox"
-                  hidden
-                  checked={task?.isSelected} // Reflect the isSelected state
-                  onChange={() => {
-                    // toggleTaskSelection(task?._id as string, numberOfTaskPerDay); // Toggle selection on change
-                    toggleTaskSelectionV2(task?._id as string, numberOfTaskPerDay, user?.userInfo?._id) // Toggle selection on change
-                    console.log("Toggled task ID:", task?._id); // Debugging log
-                  }}
-                />
-                <div className={`w-10 h-10 flex items-center justify-center rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 ${ task?.status ? "bg-yellow-500" : "bg-transparent" } hover:text-white transition duration-300`}>
-                    {/* Add any icon or content here */}
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      fill="none"
-                      viewBox="0 0 24 24"
-                      stroke="currentColor"
-                      className="w-6 h-6"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M12 4v16m8-8H4"
-                      />
-                    </svg>
-                </div>
-              </label>
-            </div>
+          <div className=''
+            onClick={ () => {
+              // selectTask (task?._id as string); 
+              router?.push(`/backoffice/task-list/${ task?._id }`)
+            }}
+          >
+            <p className="text-sm font-bold">{task.taskShortInstruction}</p>
+            <p className="text-lg font-semibold text-primary mt-2">XOF {task.packageId?.priceEarnedPerTaskDone}</p>
+          </div>
+
+          <div className='flex items-center justify-center w-[100px] h-[100px]'>
+            <label
+              htmlFor={`task-${task._id}`}
+              className="flex items-center space-x-2 cursor-pointer"
+            >
+
+              <input
+                id={`task-${task?._id}`} // Unique ID for each checkbox
+                type="checkbox"
+                hidden
+                checked={task?.isSelected} // Reflect the isSelected state
+                onChange={async () => {
+                  // toggleTaskSelection(task?._id as string, numberOfTaskPerDay); // Toggle selection on change
+                  await toggleTaskSelectionV2(task?._id as string, numberOfTaskPerDay, user?.userInfo?._id) // Toggle selection on change
+                  onRefresh(); // Trigger refresh after toggling
+                  console.log("Toggled task ID:", task?._id); // Debugging log
+                }}
+              />
+
+              <div className={`w-10 h-10 flex items-center justify-center rounded-full border-2 border-yellow-500 text-yellow-500 hover:bg-yellow-500 ${ task?.status ? "bg-yellow-500" : "bg-transparent" } hover:text-white transition duration-300`}>
+                {/* Add any icon or content here */}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  className="w-6 h-6"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M12 4v16m8-8H4"
+                  />
+                </svg>
+              </div>
+
+            </label>
+          </div>
         </div>
     </>
   );
 };
 
-export default TaskCardStyled;
+export default React.memo(TaskCardStyled);
 
 
 

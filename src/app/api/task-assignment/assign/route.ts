@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     );
 
     return NextResponse.json({
-      message: 'Task assigned successfully',
+      message: 'Tâche assignée avec succès',
       assignment,
     });
   } catch (error: any) {

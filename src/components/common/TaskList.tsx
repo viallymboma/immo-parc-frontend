@@ -1,5 +1,8 @@
 import React from 'react';
 
+import useFetchTaskAssigments from '@/hooks/useFetchTaskAssigment';
+import useFetchTasks from '@/hooks/useFetchTasks';
+
 import NavigationContent from './navigation/NavigationContent';
 import TaskCard from './TaskCard';
 
@@ -9,6 +12,18 @@ type TaskListType = {
 }
 
 const TaskList: React.FC <TaskListType> = ({itemsList, itemsFilterList}) => {
+
+    const { refetchTasks } = useFetchTasks (); 
+    const { refetchTaskAssignments } = useFetchTaskAssigments ()
+
+    const handleRefresh = React.useCallback(async () => {
+        try {
+            await Promise.all([refetchTasks(), refetchTaskAssignments()]);
+        } catch (error) {
+            console.error("Error refreshing data:", error);
+        }
+    }, []);
+
     return (
         <div>
             <NavigationContent 
@@ -18,7 +33,7 @@ const TaskList: React.FC <TaskListType> = ({itemsList, itemsFilterList}) => {
             {itemsList.map((property: any) => {
                 return (
                     <div key={ property?.id } className='flex flex-row gap-4 items-center justify-between bg-white shadow-lg rounded-lg p-4 max-w-sm'>
-                        <TaskCard task={ property } />
+                        <TaskCard task={ property } onRefresh={handleRefresh} />
                     </div>
                 )
             })}

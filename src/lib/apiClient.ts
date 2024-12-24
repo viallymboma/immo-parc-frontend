@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 import { BASE_API_URL } from './constants';
+import { removeUserCookies } from './cookies';
 
 // import { BASE_API_URL } from './constants';
 
@@ -16,6 +17,7 @@ apiClient.interceptors.response.use(
   (error) => {
     if (error.response?.status === 401) {
       // Trigger sign-out on token expiration
+      removeUserCookies ()
       window.location.href = '/auth/signin'; // Redirect to a sign-out page or trigger a state change
     }
     return Promise.reject(error);

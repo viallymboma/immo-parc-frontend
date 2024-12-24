@@ -41,14 +41,11 @@ const images = [
 
 const BackofficeModule = () => {
 
-  const { tasksDataSet, error, isValidating } = useFetchTasks (); 
-  const { taskAssignment } = useFetchTaskAssigments ()
+  const { tasksDataSet, error, isValidating, refetchTasks } = useFetchTasks (); 
+  const { taskAssignment, refetchTaskAssignments } = useFetchTaskAssigments ()
 
   const { tasks_, filteredTasksFromBackend } = useTaskStore(); 
-
-  // const { tasks_, selectedCategory, filteredTasks, filteredTasksFromBackend, toggleCategory } = useTaskStore(); 
-
-  console.log(tasks_, "uuuujjjj", filteredTasksFromBackend); 
+  const [refreshKey, setRefreshKey] = React.useState(0);
 
   function replaceById(arr1: any, arr2: any) {
     // Create a map of objects from arr2, indexed by _id
@@ -66,29 +63,37 @@ const BackofficeModule = () => {
     });
   }
 
-  const intermediateObjects = replaceById(tasks_, filteredTasksFromBackend);
+  // const handleRefresh = async () => {
+  //   // await refetchTasks(); // Call the refetch function from the store
+  //   refetchTaskAssignments 
+  //   setRefreshKey((prev) => prev + 1); // Trigger re-render by changing the key
+  // };
+
+  // const handleRefresh = async () => {
+  //   try {
+  //     await Promise.all([refetchTasks(), refetchTaskAssignments()]);
+  //   } catch (error) {
+  //     console.error("Error refreshing data:", error);
+  //   }
+  // };
+
+  const handleRefresh = React.useCallback(async () => {
+    try {
+      await Promise.all([refetchTasks(), refetchTaskAssignments()]);
+    } catch (error) {
+      console.error("Error refreshing data:", error);
+    }
+  }, []);
+
+  // const intermediateObjects = replaceById(tasks_, filteredTasksFromBackend);
+
+  const intermediateObjects = React.useMemo(
+    () => replaceById(tasks_, filteredTasksFromBackend),
+    [tasks_, filteredTasksFromBackend]
+  );
+  
 
   console.log(intermediateObjects, "before all")
-
-  // const intermediateObjects = tasks_.map((task: TaskDataType) => {
-  //   let findSelectedTaskInBn;
-  //   if (filteredTasksFromBackend && filteredTasksFromBackend?.length > 0) {
-  //     findSelectedTaskInBn = filteredTasksFromBackend?.find(bnObj => task?._id === bnObj?._id)
-  //   }
-  //   return {
-  //     ...task, findSelectedTaskInBn
-  //   }
-  // })
-
-  // if (isValidating) {
-  //   return <div>Loading...</div>
-  // }
-
-  // if (error) {
-  //   return <div>Error...</div>
-  // }
-
-  // console.log(tasksDataSet, "uuuuuuuuuuu")
 
   return (
     <div>
@@ -128,18 +133,17 @@ const BackofficeModule = () => {
           {intermediateObjects?.map((property: TaskDataType) => {
             return (
                 <div key={ property?._id } className='flex flex-row gap-1 items-center justify-between dark:bg-[#122031] bg-white shadow-lg rounded-lg  max-w-sm'>
-                    <TaskCardStyled task={ property } />
+                    <TaskCardStyled 
+                    task={ property } 
+                    onRefresh={handleRefresh} // Pass refresh handler to child
+                    />
                 </div>
             )
           })}
         </div>
-        {/* <TaskList itemsList={tasks} itemsFilterList={ extractCategories } /> */}
       </div>
 
       <div className="w-full max-w-2xl my-5 mx-auto">
-        {/* <div className='text-primary text-[20px] font-bold mb-5'>
-          Les temoignages
-        </div> */}
         <TestimonialList />
       </div>
       <section>

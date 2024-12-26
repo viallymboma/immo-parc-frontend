@@ -9,7 +9,10 @@ import {
   Youtube,
 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import toast from 'react-hot-toast';
 
+import useFetchTaskAssigments from '@/hooks/useFetchTaskAssigment';
+import useFetchTasks from '@/hooks/useFetchTasks';
 import { BASE_API_URL } from '@/lib/constants';
 
 import { Button } from '../ui/button';
@@ -27,23 +30,71 @@ type TaskDetailCardProps = {
 };
 
 const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
-    // const { submitTask } = task;
     const [selectedImage, setSelectedImage] = React.useState<File | null>(null); // State for storing the selected image
     const [uploading, setUploading] = React.useState(false);
-
-    console.log(task, "the task...."); 
+    const { refetchTasks } = useFetchTasks (); 
+    const { refetchTaskAssignments } = useFetchTaskAssigments ()
 
     const router = useRouter ()
-    // Function to copy the URL to clipboard
-    const copyToClipboard = async () => {
+
+    const copyToClipboard = React.useCallback(async () => {
         try {
             await navigator.clipboard.writeText(task?.taskLink);
-            alert("URL copied to clipboard!");
+            toast.success('URL copiée dans le presse-papier!'); 
         } catch (error) {
             console.error("Failed to copy URL:", error);
-            alert("Failed to copy URL");
+            toast.error("Échec de la copie de l'URL"); 
         }
-    };
+    }, [])
+
+    const clearImage = React.useCallback(() => {
+        setSelectedImage(null);
+        // Reset the input value to allow selecting the same image again
+        const input = document.getElementById('imageUpload') as HTMLInputElement;
+        if (input) {
+            input.value = '';
+        }
+    }, [])
+
+    // const handleImageUpload = React.useCallback(async () => {
+    //     if (!selectedImage) return;
+
+    //     setUploading(true);
+
+    //     const formData = new FormData();
+    //     formData.append('image', selectedImage);
+    //     formData.append('taskAssignmentId', task?.taskAssignmentId || ""); // Add taskAssignmentId
+
+    //     try {
+    //         const response = await fetch('/api/cloudinary-upload', {
+    //             method: 'POST',
+    //             body: formData,
+    //         });
+
+    //         if (!response.ok) {
+    //             throw new Error('Failed to upload image');
+    //         }
+
+    //         const result = await response.json();
+
+    //         try {
+    //             await Promise.all([refetchTasks(), refetchTaskAssignments()]);
+    //         } catch (error) {
+    //             toast.error("Erreur lors de l'actualisation des données"); 
+    //             console.error("Erreur lors de l'actualisation des données :", error);
+    //         }
+
+    //         // alert('Tâche terminée avec succès!!');
+    //         clearImage (); 
+    //         toast.success('Tâche terminée avec succès!!'); 
+    //         console.log(result); // Contains the server response
+    //     } catch (error) {
+    //         console.error(error);
+    //         // alert('Error uploading image');
+    //     } finally {
+    //         setUploading(false);
+    //     }
+    // }, [])
 
     const handleImageUpload = async () => {
         if (!selectedImage) return;
@@ -65,11 +116,21 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
             }
 
             const result = await response.json();
-            alert('Image uploaded successfully!');
+
+            try {
+                await Promise.all([refetchTasks(), refetchTaskAssignments()]);
+            } catch (error) {
+                toast.error("Erreur lors de l'actualisation des données"); 
+                console.error("Erreur lors de l'actualisation des données :", error);
+            }
+
+            // alert('Tâche terminée avec succès!!');
+            clearImage (); 
+            toast.success('Tâche terminée avec succès!!'); 
             console.log(result); // Contains the server response
         } catch (error) {
             console.error(error);
-            alert('Error uploading image');
+            // alert('Error uploading image');
         } finally {
             setUploading(false);
         }
@@ -92,39 +153,36 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                     </div>
                 </div>
 
-                <div className="flex items-center justify-between">
-
-                { task?.status === "completed" ? 
-                    null
-                    :
-                    <div className="flex items-center space-x-2">
-                        <label
-                            htmlFor="imageUpload"
-                            className={`flex items-center space-x-2 cursor-pointer`}
-                        >
-                            <input
-                                id="imageUpload"
-                                type="file"
-                                accept="image/*"
-                                className="hidden" // Hide the input visually
-                                // onChange={handleImageUpload}
-                                onChange={(e) => {
-                                    const file = e.target.files?.[0];
-                                    if (file) {
-                                        setSelectedImage(file);
-                                    }
-                                }}
-                            />
-                            <div className="w-5 h-5 text-yellow-400">
-                                <Camera className="w-full h-full" />
-                            </div>
-                            <span className="text-sm font-medium text-gray-600">Upload Image</span>
-                        </label>
-                    </div>
-                }
-
-
+                <div className="flex flex-col items-start gap-3 justify-between">
                     <div className="text-xl font-bold text-red-500">XOF : {task?.packageId?.priceEarnedPerTaskDone }</div>
+                    { task?.status === "completed" ? 
+                        null
+                        :
+                        <div className="flex items-center space-x-2">
+                            <label
+                                htmlFor="imageUpload"
+                                className={`flex items-center justify-between cursor-pointer`}
+                            >
+                                <input
+                                    id="imageUpload"
+                                    type="file"
+                                    accept="image/*"
+                                    className="hidden" // Hide the input visually
+                                    // onChange={handleImageUpload}
+                                    onChange={(e) => {
+                                        const file = e.target.files?.[0];
+                                        if (file) {
+                                            setSelectedImage(file);
+                                        }
+                                    }}
+                                />
+                                <div className="w-5 h-5 text-yellow-400">
+                                    <Camera className="w-full h-full" />
+                                </div>
+                                <span className="text-sm ml-3 font-medium text-gray-600 truncate">Télécharger une image</span>
+                            </label>
+                        </div>
+                    }
                 </div>
                 {/* Display the selected image */}
                 {selectedImage && (
@@ -137,14 +195,7 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                     />
                     {/* Clear Button */}
                     <button
-                        onClick={() => {
-                            setSelectedImage(null);
-                            // Reset the input value to allow selecting the same image again
-                            const input = document.getElementById('imageUpload') as HTMLInputElement;
-                            if (input) {
-                                input.value = '';
-                            }
-                        }}
+                        onClick={ clearImage }
                         className="text-sm text-red-500 hover:underline"
                     >
                         Clear
@@ -166,7 +217,6 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                         <span>Audit :</span>
                         <Button 
                             onClick={async () => {
-                            // router.push(`${ task?.taskLink }`)
                                 if (task?.taskLink) {
                                     window.open(task.taskLink, '_blank');
 
@@ -186,12 +236,20 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                                     const result = await response.json();
 
                                     if (!response.ok) {
+                                        toast.error("Échec de la mise à jour de l'état de la tâche")
                                         throw new Error(result.error || 'Failed to update task status');
                                     }
 
                                     console.log("AFTER REQUEST STATUS REQUEST"); 
 
-                                    alert('Task status updated to in-progress');
+                                    // alert('Task status updated to in-progress');
+                                    // onRefresh(); // Trigger refresh after toggling
+                                    try {
+                                        await Promise.all([refetchTasks(), refetchTaskAssignments()]);
+                                    } catch (error) {
+                                        console.error("Error refreshing data:", error);
+                                    }
+                                    toast.success("Statut de la tâche mis à jour comme étant en cours")
                                 }
                             }}
                             variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700">
@@ -203,8 +261,9 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                     <div className="flex items-center justify-between text-sm text-gray-500">
                         <span>Lien :</span>
                         <Button
-                        onClick={ copyToClipboard }
-                        variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700">
+                            onClick={ copyToClipboard }
+                            variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700"
+                        >
                             <Copy className="w-4 h-4 mr-1" />
                             Copiez le lien
                         </Button>
@@ -220,19 +279,30 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                         </div>
                         <span className="ml-3 text-sm text-gray-600">Service</span>
                     </div>
-                    <Button
-                        onClick={handleImageUpload}
-                        disabled={
-                            task?.status === "pending" || uploading
-                        } // Disable if in "pending" state or upload is happening
-                        className={`${
-                            task?.status === "pending" || uploading
-                            ? "bg-slate-400 cursor-not-allowed hover:bg-slate-400"
-                            : "bg-yellow-500 hover:bg-yellow-600"
-                        } text-white px-6 py-2 rounded`}
-                        >
-                        {uploading ? "En cour..." : "Soumettre"}
-                    </Button>
+                    {
+                        task?.status === "completed" ? 
+                            <Button
+                                onClick={handleImageUpload}
+                                disabled={true} // Disable if in "pending" state or upload is happening
+                                className={`bg-slate-400 cursor-not-allowed hover:bg-slate-400 text-white px-6 py-2 rounded`}
+                                >
+                                Tâche accomplie
+                            </Button>
+                            :
+                            <Button
+                                onClick={handleImageUpload}
+                                disabled={
+                                    task?.status === "pending" || uploading || task?.status === "in-progress" && !selectedImage ? true : false
+                                } // Disable if in "pending" state or upload is happening
+                                className={`${
+                                    task?.status === "pending" || uploading || task?.status === "in-progress" && !selectedImage
+                                    ? "bg-slate-400 cursor-not-allowed hover:bg-slate-400"
+                                    : "bg-yellow-500 hover:bg-yellow-600"
+                                } text-white px-6 py-2 rounded`}
+                                >
+                                {task?.status === "pending" ? "Cliquez le lien" : uploading ? "En cour..." : task?.status === "in-progress" && !selectedImage ? "Selectionner image" : "Soumettre"}
+                            </Button>
+                    }
                 </div>
             </CardFooter>
         </Card>

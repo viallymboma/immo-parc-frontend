@@ -23,7 +23,7 @@ const RootLayout = ({ children }: Readonly<{ children: React.ReactNode; }>) => {
         <html lang="en">
             <body>
                 <Toaster 
-                    position="top-center"
+                    position="bottom-center"
                     toastOptions={{ duration: 10000 }}
                 />
                 {loading ? <Loader /> : children}

@@ -15,10 +15,14 @@ import {
   GainsDuJourSvgIcon,
   TotalActifSvgIcon,
 } from '@/components/svgs/SvgIcons';
+import useFetchAllTasksAssigment from '@/hooks/useFetchAllTasksAssigment';
 
 const WalletModule = () => {
     const [ display, setDisplay ] = React.useState<boolean> (false); 
     const [ displayText, setDisplayText ] = React.useState<string> ("Afficher"); 
+    const { allTaskAssignment, isValidating, refetchAllTaskAssignments } = useFetchAllTasksAssigment (); 
+
+    console.log(allTaskAssignment, "rrrrrrrrrrrrrrr")
 
     const handleDisplay = (display: boolean) => {
         setDisplay(display => !display); 

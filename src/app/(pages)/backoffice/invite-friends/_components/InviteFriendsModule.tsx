@@ -2,6 +2,7 @@
 import React from 'react';
 
 import Image from 'next/image';
+import toast from 'react-hot-toast';
 
 import QRCodeComponent from '@/components/qr-code/QRCodeComponent';
 import { useUserInfo } from '@/hooks/useUserInfo';
@@ -32,16 +33,25 @@ const InviteFriendsModule = () => {
         }
     };
 
-    // Function to copy the URL to clipboard
-    const copyToClipboard = async () => {
+    // // Function to copy the URL to clipboard
+    // const copyToClipboard = async () => {
+    //     try {
+    //         await navigator.clipboard.writeText(url);
+    //         alert("URL copied to clipboard!");
+    //     } catch (error) {
+    //         console.error("Failed to copy URL:", error);
+    //         alert("Failed to copy URL");
+    //     }
+    // };
+    const copyToClipboard = React.useCallback(async () => {
         try {
             await navigator.clipboard.writeText(url);
-            alert("URL copied to clipboard!");
+            toast.success(`URL copiée : ${ url }`); 
         } catch (error) {
             console.error("Failed to copy URL:", error);
-            alert("Failed to copy URL");
+            toast.error("Échec de la copie de l'URL"); 
         }
-    };
+    }, [])
     return (
         <div className='flex flex-col items-center min-h-screen p-4'>
             <div className='w-[400px] flex justify-center'>
@@ -56,11 +66,11 @@ const InviteFriendsModule = () => {
                 />
             </div>
             <div className="flex gap-4 mt-4">
-                <button onClick={saveQRCode} className="px-4 py-2 bg-blue-600 text-white rounded">
-                    Save QR Code
+                <button onClick={saveQRCode} className="px-4 py-2 bg-blue-600 text-white rounded truncate">
+                    Enregistrer le code QR
                 </button>
-                <button onClick={copyToClipboard} className="px-4 py-2 bg-green-600 text-white rounded">
-                    Copy URL
+                <button onClick={copyToClipboard} className="px-4 py-2 bg-green-600 text-white rounded truncate">
+                    Copier URL
                 </button>
             </div>
         </div>

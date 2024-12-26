@@ -36,6 +36,7 @@ export async function POST(req: Request) {
         const arrayBuffer = await image.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const tempFilePath = `/tmp/${image.name}`;
+        console.log(arrayBuffer, buffer, "just checking===========>")
         await require('fs/promises').writeFile(tempFilePath, buffer);
 
         // Upload the file to Cloudinary
@@ -57,7 +58,7 @@ export async function POST(req: Request) {
 
         // Respond with success
         return NextResponse.json({
-            message: 'Task assignment updated successfully',
+            message: 'Tâche terminée avec succès',
             data: updatedTaskAssignment,
         });
     } catch (error: any) {

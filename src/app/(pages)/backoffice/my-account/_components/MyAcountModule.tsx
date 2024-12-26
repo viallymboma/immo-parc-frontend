@@ -13,10 +13,13 @@ import {
 //   bottomNavElementInAccount,
 // } from '@/components/data/Productsdata';
 import { ChevronRightSvgIcon } from '@/components/svgs/SvgIcons';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 import IconImage from '../../../../../../public/imgs/total des gains.png';
 
 const MyAcountModule = () => {
+
+    const { user } = useUserInfo ()
 
     return (
         <div className='flex flex-col gap-3'>
@@ -26,8 +29,8 @@ const MyAcountModule = () => {
                     <Image src={ IconImage } className='w-full' alt='image' />
                 </div>
                 <div>
-                    <h1 className='text-white dark:text-black'>695500474</h1>
-                    <p>VIP 0</p>
+                    <h1 className='text-white dark:text-black'>{ user?.userInfo?.phone }</h1>
+                    <p>{ user?.userInfo?.package?.name }</p>
                 </div>
             </div>
             <div className='flex flex-col gap-3 '>

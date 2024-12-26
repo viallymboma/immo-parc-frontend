@@ -28,6 +28,7 @@ import { useTaskStore } from '@/store/task-store';
 
 // import { useTaskStore } from '@/store/task-store';
 import AboutUs from './about-us/AboutUs';
+import { SkeletonSmallTask } from './SkeletonSmallTask';
 import TestimonialList from './testimonials/TestimonialList';
 
 // Image paths (Assumed to be in public directory)
@@ -42,10 +43,11 @@ const images = [
 const BackofficeModule = () => {
 
   const { tasksDataSet, error, isValidating, refetchTasks } = useFetchTasks (); 
-  const { taskAssignment, refetchTaskAssignments } = useFetchTaskAssigments ()
+  const { taskAssignment, refetchTaskAssignments } = useFetchTaskAssigments (); 
 
   const { tasks_, filteredTasksFromBackend } = useTaskStore(); 
-  const [refreshKey, setRefreshKey] = React.useState(0);
+
+  
 
   function replaceById(arr1: any, arr2: any) {
     // Create a map of objects from arr2, indexed by _id
@@ -63,20 +65,6 @@ const BackofficeModule = () => {
     });
   }
 
-  // const handleRefresh = async () => {
-  //   // await refetchTasks(); // Call the refetch function from the store
-  //   refetchTaskAssignments 
-  //   setRefreshKey((prev) => prev + 1); // Trigger re-render by changing the key
-  // };
-
-  // const handleRefresh = async () => {
-  //   try {
-  //     await Promise.all([refetchTasks(), refetchTaskAssignments()]);
-  //   } catch (error) {
-  //     console.error("Error refreshing data:", error);
-  //   }
-  // };
-
   const handleRefresh = React.useCallback(async () => {
     try {
       await Promise.all([refetchTasks(), refetchTaskAssignments()]);
@@ -91,7 +79,6 @@ const BackofficeModule = () => {
     () => replaceById(tasks_, filteredTasksFromBackend),
     [tasks_, filteredTasksFromBackend]
   );
-  
 
   console.log(intermediateObjects, "before all")
 
@@ -129,17 +116,32 @@ const BackofficeModule = () => {
         <div className='my-5'>
           <h1 className='text-primary text-[20px] font-bold'>Tâches pour aujourd'hui</h1>
         </div>
+
         <div className='grid grid-cols-1  sm:grid-cols-2 lg:grid-cols-3 gap-3'>
-          {intermediateObjects?.map((property: TaskDataType) => {
-            return (
-                <div key={ property?._id } className='flex flex-row gap-1 items-center justify-between dark:bg-[#122031] bg-white shadow-lg rounded-lg  max-w-sm'>
-                    <TaskCardStyled 
-                    task={ property } 
-                    onRefresh={handleRefresh} // Pass refresh handler to child
-                    />
+          {
+            isValidating ? 
+              (
+                <div className='flex flex-col gap-4'>
+                  <SkeletonSmallTask />
+                  <SkeletonSmallTask />
+                  <SkeletonSmallTask />
+                  <SkeletonSmallTask />
+                  <SkeletonSmallTask />
+                  <SkeletonSmallTask />
                 </div>
-            )
-          })}
+              )
+              :
+              intermediateObjects?.map((property: TaskDataType) => {
+                return (
+                    <div key={ property?._id } className='flex flex-row gap-1 items-center justify-between dark:bg-[#122031] bg-white shadow-lg rounded-lg  max-w-sm'>
+                        <TaskCardStyled 
+                          task={ property } 
+                          onRefresh={handleRefresh} // Pass refresh handler to child
+                        />
+                    </div>
+                )
+              })
+          }
         </div>
       </div>
 

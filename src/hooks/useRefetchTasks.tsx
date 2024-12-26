@@ -36,7 +36,7 @@ const useRefetchTasks = async () => {
 
         // Clear tasks and task assignments on error
         setTasks([]);
-        setSelectedTaskFromBack([]);
+        setSelectedTaskFromBack([] as any);
 
         throw error; // Re-throw the error if needed for handling elsewhere
     }

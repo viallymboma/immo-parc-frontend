@@ -42,6 +42,28 @@ export class TaskAssignmentService {
     return taskAssignments;
   }
 
+  async getAllTasksForUser(userId: string): Promise<ITaskAssignment[]> {
+    // const today = new Date();
+    // const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+    // const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+    const taskAssignments = await this.taskAssignmentModel
+      .find({
+        user: userId,
+        // createdAt: { $gte: startOfDay, $lte: endOfDay }, // Filter by today's date
+      })
+      .populate({
+        path: 'task', 
+        populate: 'packageId'
+      })
+      .populate({
+        path: 'user',
+        model: 'User'
+      });
+
+    return taskAssignments;
+  }
+
   async assignTaskToUser(userId: string, taskId: string): Promise<ITaskAssignment> {
     const user: any = await this.userModel.findById(userId).populate('package');
     if (!user || !user.package) {

@@ -16,10 +16,12 @@ interface TaskState {
   selectedCategory?: string; // Array of selected tasks
   filteredTasks?: TaskDataType[]; // Array of selected tasks
   filteredTasksFromBackend?: TaskDataType[]; // Array of selected tasks
+  allSelecTasksForUsers?: TaskDataType[];
   setTasks: (tasks_: TaskDataType[]) => void; // Load all tasks
   toggleTaskSelection: (id: number | string, numberOfTaskPerDay: number) => void; // Add or remove a task from the selection
   toggleTaskSelectionV2: (id: number | string, numberOfTaskPerDay: number, userId: string) => void; // Add or remove a task from the selection
-  setSelectedTaskFromBack: (filteredTasks: any) => void;
+  setSelectedTaskFromBack: (filteredTasks: TaskDataType) => void;
+  setAllSelectedTaskFromBack: (allSelecTasksForUsers: TaskDataType) => void;
   toggleCategory: (category: string, taskAssignment: TaskDataType[]) => void; 
   clearTaskSelection: () => void; // Clear all selected tasks
   selectTask: (id: number | string) => void; // Select a specific task by ID
@@ -33,6 +35,7 @@ export const useTaskStore = create<TaskState>((set, get) => {
     selectedTask: null, // No task selected by default
     selectedTasks: get()?.selectedTasks || [], // Array of selected tasks
     filteredTasksFromBackend: get()?.filteredTasksFromBackend || [],
+    allSelecTasksForUsers: get()?.allSelecTasksForUsers || [],
 
     // Load all tasks
     setTasks: (tasks) =>
@@ -76,6 +79,16 @@ export const useTaskStore = create<TaskState>((set, get) => {
         };
       }),
 
+    setAllSelectedTaskFromBack: (allSelecTasksForUsers: any) =>
+      set((state) => {
+        console.log(allSelecTasksForUsers, "in the store==============>")
+        return {
+          ...state,
+          allSelecTasksForUsers,
+          // filteredTasks: allSelecTasksForUsers, 
+        };
+      }),
+
     // Select a specific task by ID
     selectTask: (id) =>
       set((state) => ({
@@ -86,28 +99,62 @@ export const useTaskStore = create<TaskState>((set, get) => {
       })),
 
     toggleTaskSelectionV2: async (id: any, maxTasks: any, userId: any) => {
+
       const { filteredTasksFromBackend } = get();
-      const taskIndex = get().tasks_.findIndex((task) => task._id === id);
-      if (taskIndex === -1) return; // Task not found
 
-      const task = get().tasks_[taskIndex];
-      const isSelected = !task.isSelected;
+      // Safely determine the source of tasks
+      let taskSource = 
+        filteredTasksFromBackend && filteredTasksFromBackend.length > 0
+          ? filteredTasksFromBackend
+          : get().tasks_;
 
-      // Check if this task exist in the assigned task and if it is already in-progress
-      const checkIfTaskInProgress = filteredTasksFromBackend?.filter((t) => t._id === id && t.status !== "pending");
+      console.log(taskSource, "taskSource")
 
-      console.log(checkIfTaskInProgress, "okay")
-
-      if (checkIfTaskInProgress && checkIfTaskInProgress?.length > 0) {
-        // alert(`Vous ne pouvez pas deselectionner une tache deja en cour.`);
-        toast.error(`Vous ne pouvez pas désélectionner une tâche deja en cour.`)
-        return
+      if (!taskSource || taskSource.length === 0) {
+        console.warn("Task source is undefined or empty.");
+        return;
       }
-    
+
+      let taskIndex = taskSource.findIndex((task) => task?._id === id);
+
+      if (taskIndex === -1) {
+        console.warn("Task not found in the first source. Trying fallback source");
+        taskSource = get().tasks_;
+        taskIndex = taskSource.findIndex((task) => task?._id === id);
+        if (taskIndex === -1) {
+          console.warn("Task not found in the source.");
+          return;
+        }
+      }
+
+      const task = taskSource[taskIndex];
+
+      if (!task) {
+        console.warn("Task is undefined.");
+        return;
+      }
+
+      let isSelected = false
+
+      // Check for the `status` property
+      if (typeof task.status !== "undefined") {
+        // Perform unassignment logic if status exists and is "pending"
+        if (task.status === "pending") {
+          // Unassignment is allowed
+          isSelected = false
+        } else {
+          // Cannot unassign non-pending tasks
+          toast.error(`Vous ne pouvez pas désélectionner une tâche déjà en cours.`);
+          return;
+        }
+      } else if (typeof task.isSelected !== "undefined") {
+        // Perform selection/assignment logic if `isSelected` exists
+        isSelected = !task.isSelected;
+      }
+
       // Check the maxTasks limit
-      if (isSelected && get().selectedTasks.length >= maxTasks) {
-        // alert(`You can only select up to ${maxTasks} tasks per day.`);
-        toast.error(`Vous ne pouvez sélectionner que jusqu'à ${maxTasks} tâches par jour.`)
+      if (isSelected && get().selectedTasks?.length >= maxTasks) {
+        toast.error(`Vous ne pouvez sélectionner que jusqu'à ${maxTasks} tâches par jour.`);
         return;
       }
 
@@ -116,7 +163,7 @@ export const useTaskStore = create<TaskState>((set, get) => {
           ? `${BASE_API_URL}/task-assignment/assign`
           : `${BASE_API_URL}/task-assignment/unassign`;
         const method = isSelected ? 'POST' : 'DELETE';
-
+  
         // Assign or unassign task via API call
         const data = await fetch(endpoint, {
           method,
@@ -124,16 +171,14 @@ export const useTaskStore = create<TaskState>((set, get) => {
           body: JSON.stringify({ userId, taskId: id }),
         });
 
-        const response = await data?.json()
+        const response = await data?.json();
 
-        if (!data.ok){ 
-          toast.error(`${response?.error}`)
-          // alert(response?.error)
-          throw new Error('API request failed'); 
+        if (!data.ok) {
+          toast.error(`${response?.error}`);
+          throw new Error('API request failed');
         } else {
-          toast.success(`${response?.message}`)
-          // alert(response?.message)
-        };
+          toast.success(`${response?.message}`);
+        }
 
         // Update state after successful API call
         set((state) => {
@@ -141,21 +186,23 @@ export const useTaskStore = create<TaskState>((set, get) => {
             tasks.map((t) =>
               t._id === id ? { ...t, isSelected } : t
             );
-          const updateTaskSelection2 = (tasks: any[]) => isSelected ? 
-            tasks.map((t) =>
-              t._id === id ? { ...t, isSelected } : t
-            ) : 
-            tasks?.filter((t) => t._id !== id);
+
+          const updateTaskSelection2 = (tasks: any[]) =>
+            isSelected
+              ? tasks.map((t) =>
+                  t._id === id ? { ...t, isSelected } : t
+                )
+              : tasks?.filter((t) => t._id !== id);
 
           const updatedTasks = updateTaskSelection(state.tasks_);
-          const updatedFilteredTasks = updateTaskSelection2(state?.filteredTasks!);
+          const updatedFilteredTasks = updateTaskSelection2(state?.filteredTasks || []);
           const updatedFilteredTasksFromBackend = updateTaskSelection2(
-            state?.filteredTasksFromBackend!
+            state?.filteredTasksFromBackend || []
           );
 
           const updatedSelectedTasks = isSelected
-            ? [...state.selectedTasks, { ...task, isSelected }]
-            : state.selectedTasks.filter((t) => t._id !== id);
+            ? [...(state.selectedTasks || []), { ...task, isSelected }]
+            : (state.selectedTasks || []).filter((t) => t._id !== id);
 
           return {
             tasks_: updatedTasks,
@@ -166,14 +213,11 @@ export const useTaskStore = create<TaskState>((set, get) => {
         });
       } catch (error: any) {
         console.error(error.message);
-        // alert('Failed to update task selection. Please try again.');
-        toast.error(`Échec de la mise à jour de la sélection de tâches. Veuillez réessayer.`)
+        toast.error(`Échec de la mise à jour de la sélection de tâches. Veuillez réessayer.`);
       }
     },
-    
 
 
-    // Add or remove a task from the selection
     toggleTaskSelection: (id, maxTasks) =>
       set((state) => {
         const taskIndex = state.tasks_.findIndex((task) => task._id === id);
@@ -269,6 +313,205 @@ export const useTaskStore = create<TaskState>((set, get) => {
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    // toggleTaskSelectionV2: async (id: any, maxTasks: any, userId: any) => {
+    //   const { filteredTasksFromBackend } = get();
+    //   const taskIndex = get().tasks_.findIndex((task) => task._id === id);
+    //   if (taskIndex === -1) return; // Task not found
+
+    //   const task = get().tasks_[taskIndex];
+    //   const isSelected = !task.isSelected;
+
+    //   // Check if this task exist in the assigned task and if it is already in-progress
+    //   const checkIfTaskInProgress = filteredTasksFromBackend?.filter((t) => t._id === id && t.status !== "pending");
+
+    //   console.log(checkIfTaskInProgress, "okay")
+
+    //   if (checkIfTaskInProgress && checkIfTaskInProgress?.length > 0) {
+    //     // alert(`Vous ne pouvez pas deselectionner une tache deja en cour.`);
+    //     toast.error(`Vous ne pouvez pas désélectionner une tâche deja en cour.`)
+    //     return
+    //   }
+    
+    //   // Check the maxTasks limit
+    //   if (isSelected && get().selectedTasks.length >= maxTasks) {
+    //     // alert(`You can only select up to ${maxTasks} tasks per day.`);
+    //     toast.error(`Vous ne pouvez sélectionner que jusqu'à ${maxTasks} tâches par jour.`)
+    //     return;
+    //   }
+
+    //   try {
+    //     const endpoint = isSelected
+    //       ? `${BASE_API_URL}/task-assignment/assign`
+    //       : `${BASE_API_URL}/task-assignment/unassign`;
+    //     const method = isSelected ? 'POST' : 'DELETE';
+
+    //     // Assign or unassign task via API call
+    //     const data = await fetch(endpoint, {
+    //       method,
+    //       headers: { 'Content-Type': 'application/json' },
+    //       body: JSON.stringify({ userId, taskId: id }),
+    //     });
+
+    //     const response = await data?.json()
+
+    //     if (!data.ok){ 
+    //       toast.error(`${response?.error}`)
+    //       // alert(response?.error)
+    //       throw new Error('API request failed'); 
+    //     } else {
+    //       toast.success(`${response?.message}`)
+    //       // alert(response?.message)
+    //     };
+
+    //     // Update state after successful API call
+    //     set((state) => {
+    //       const updateTaskSelection = (tasks: any[]) =>
+    //         tasks.map((t) =>
+    //           t._id === id ? { ...t, isSelected } : t
+    //         );
+    //       const updateTaskSelection2 = (tasks: any[]) => isSelected ? 
+    //         tasks.map((t) =>
+    //           t._id === id ? { ...t, isSelected } : t
+    //         ) : 
+    //         tasks?.filter((t) => t._id !== id);
+
+    //       const updatedTasks = updateTaskSelection(state.tasks_);
+    //       const updatedFilteredTasks = updateTaskSelection2(state?.filteredTasks!);
+    //       const updatedFilteredTasksFromBackend = updateTaskSelection2(
+    //         state?.filteredTasksFromBackend!
+    //       );
+
+    //       const updatedSelectedTasks = isSelected
+    //         ? [...state.selectedTasks, { ...task, isSelected }]
+    //         : state.selectedTasks.filter((t) => t._id !== id);
+
+    //       return {
+    //         tasks_: updatedTasks,
+    //         filteredTasks: updatedFilteredTasks,
+    //         filteredTasksFromBackend: updatedFilteredTasksFromBackend,
+    //         selectedTasks: updatedSelectedTasks,
+    //       };
+    //     });
+    //   } catch (error: any) {
+    //     console.error(error.message);
+    //     // alert('Failed to update task selection. Please try again.');
+    //     toast.error(`Échec de la mise à jour de la sélection de tâches. Veuillez réessayer.`)
+    //   }
+    // },
+    
+
+
+    // Add or remove a task from the selection
+    
+    
+    // toggleTaskSelectionV2: async (id: any, maxTasks: any, userId: any) => {
+    //   const { filteredTasksFromBackend } = get();
+    //   const taskIndex = get().tasks_.findIndex((task) => task._id === id);
+    //   if (taskIndex === -1) return; // Task not found
+      
+    //   const task = get().tasks_[taskIndex];
+    //   console.log(task, "in zustang, ===========>")
+      
+    //   // Check if `isSelected` exists
+    //   const isSelected = typeof task.isSelected !== "undefined" ? !task.isSelected : false;
+    
+    //   // If `isSelected` exists, perform assignment logic
+    //   if (typeof task.isSelected !== "undefined") {
+    //     // Check the maxTasks limit
+    //     if (isSelected && get().selectedTasks.length >= maxTasks) {
+    //       toast.error(`Vous ne pouvez sélectionner que jusqu'à ${maxTasks} tâches par jour.`);
+    //       return;
+    //     }
+    //   } 
+    //   // If `task.exist` and `status === "pending"`, perform unassignment logic
+    //   else if (task.status === "pending") {
+    //     // Allow unassignment
+    //   } else {
+    //     // Invalid condition: cannot perform unassignment for non-pending tasks
+    //     toast.error(`Vous ne pouvez pas désélectionner une tâche déjà en cours.`);
+    //     return;
+    //   }
+    
+    //   try {
+    //     const endpoint = isSelected
+    //       ? `${BASE_API_URL}/task-assignment/assign`
+    //       : `${BASE_API_URL}/task-assignment/unassign`;
+    //     const method = isSelected ? 'POST' : 'DELETE';
+    
+    //     // Assign or unassign task via API call
+    //     const data = await fetch(endpoint, {
+    //       method,
+    //       headers: { 'Content-Type': 'application/json' },
+    //       body: JSON.stringify({ userId, taskId: id }),
+    //     });
+    
+    //     const response = await data?.json();
+    
+    //     if (!data.ok) {
+    //       toast.error(`${response?.error}`);
+    //       throw new Error('API request failed');
+    //     } else {
+    //       toast.success(`${response?.message}`);
+    //     }
+    
+    //     // Update state after successful API call
+    //     set((state) => {
+    //       const updateTaskSelection = (tasks: any[]) =>
+    //         tasks.map((t) =>
+    //           t._id === id ? { ...t, isSelected } : t
+    //         );
+    
+    //       const updateTaskSelection2 = (tasks: any[]) =>
+    //         isSelected
+    //           ? tasks.map((t) =>
+    //               t._id === id ? { ...t, isSelected } : t
+    //             )
+    //           : tasks?.filter((t) => t._id !== id);
+    
+    //       const updatedTasks = updateTaskSelection(state.tasks_);
+    //       const updatedFilteredTasks = updateTaskSelection2(state?.filteredTasks!);
+    //       const updatedFilteredTasksFromBackend = updateTaskSelection2(
+    //         state?.filteredTasksFromBackend!
+    //       );
+    
+    //       const updatedSelectedTasks = isSelected
+    //         ? [...state.selectedTasks, { ...task, isSelected }]
+    //         : state.selectedTasks.filter((t) => t._id !== id);
+    
+    //       return {
+    //         tasks_: updatedTasks,
+    //         filteredTasks: updatedFilteredTasks,
+    //         filteredTasksFromBackend: updatedFilteredTasksFromBackend,
+    //         selectedTasks: updatedSelectedTasks,
+    //       };
+    //     });
+    //   } catch (error: any) {
+    //     console.error(error.message);
+    //     toast.error(`Échec de la mise à jour de la sélection de tâches. Veuillez réessayer.`);
+    //   }
+    // },
 
 
 

@@ -29,18 +29,27 @@ const TaskListModule = () => {
 
     console.log(extractCategories, "pppppppppppppppp", )
 
+    const counts = filteredTasksFromBackend?.reduce(
+        (acc, task) => {
+            if (task.status === "completed") acc.completed++;
+            if (task.status === "pending") acc.pending++;
+            return acc;
+        },
+        { completed: 0, pending: 0 }
+    );
+
     return (
         <div>
 
             <div className='flex flex-row gap-3'>
                 <div className='flex flex-col text-center '>
-                    <span>0</span>
+                    <span>{ counts?.pending }</span>
                     <h1 className='text-[12px]'>Tâches restantes d'aujourd'hui</h1>
                 </div>
                 {/* <Separator /> */}
                 <div className='h-10 w-[1px] bg-black'></div>
                 <div className='flex flex-col text-center '>
-                    <span>0</span>
+                    <span>{ counts?.completed }</span>
                     <h1 className='text-[12px]'>Tâches termnées aujourd'hui</h1>
                 </div>
             </div>

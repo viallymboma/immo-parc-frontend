@@ -43,6 +43,6 @@ export const loginUser = async (user: any) => {
         updatedAt: user.updatedAt,
     };
 
-    return await jwt.sign(payload, JWT_SECRET, { expiresIn: '7d' }); // Adjust expiration as needed
+    return await jwt.sign(payload, JWT_SECRET, { expiresIn: '5m' }); // Adjust expiration as needed
 
 };

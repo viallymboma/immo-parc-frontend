@@ -4,7 +4,10 @@ import bcrypt from 'bcryptjs';
 import { connectToDatabase } from '@/app/lib/mongodb';
 
 import { INITIAL_SELECTED_TASKCOUNT } from '../constants';
-import { Packages } from '../models';
+import {
+  Packages,
+  Wallet,
+} from '../models';
 import User, { IUser } from '../models/User';
 
 // Ensure mongoose connection is made
@@ -71,6 +74,18 @@ export const usersService = {
 
     console.log(user, "user thing")
 
+    // Create wallet for the user
+    const wallet = new Wallet({
+      balance: 0,
+      user: user._id,
+    });
+    await wallet.save();
+
+    // Link wallet to user
+    user.wallet = wallet._id;
+    // await user.save();
+
+    // SAVE USER UPDATE
     await user.save();
 
     if (parent) {

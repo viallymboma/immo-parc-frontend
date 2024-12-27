@@ -44,7 +44,8 @@ export async function POST(request: Request) {
       // secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
       // secure: true,
       // maxAge: 24 * 60 * 60 * 1000, // Set expiration for the cookie (1 day in ms)
-      maxAge: 3600000, // Cookie expiration time (e.g., 1 hour)
+      // maxAge: 3600000, // Cookie expiration time (e.g., 1 hour)
+      maxAge: 5 * 60, // 5 minutes in seconds
       // sameSite: 'strict', // Restrict cookie usage to same site
     });
 

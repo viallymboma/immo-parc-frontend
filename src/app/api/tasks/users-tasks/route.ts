@@ -30,6 +30,7 @@ export async function GET(req: NextRequest) {
         }
 
         const userInfo: any = await verifyJWT(token);
+        console.log(userInfo, "iiiiiiiiiiiiiiiiiiiiiii")
 
         if (userInfo.role === 'super_admin') {
             const tasks = await getAllTasks ()
@@ -41,6 +42,8 @@ export async function GET(req: NextRequest) {
         return NextResponse.json(tasks);
 
     } catch (error: any) {
+
+        console.log(error, "the error....")
 
         return NextResponse.json({ error: error.message }, { status: 500 });
 

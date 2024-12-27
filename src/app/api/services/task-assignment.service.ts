@@ -3,6 +3,7 @@
 // import { UsersDocument } from '@/models/user.entity';
 import mongoose, { Model } from 'mongoose';
 
+import { Wallet } from '../models';
 import { ITask } from '../models/Task';
 import { ITaskAssignment } from '../models/TaskAssignment';
 import { IUser } from '../models/User';
@@ -177,17 +178,54 @@ export class TaskAssignmentService {
     taskAssignmentId: string,
     picture: { name: string; public_id: string; url: string }
   ): Promise<ITaskAssignment> {
-    const taskAssignment = await this.taskAssignmentModel.findById(taskAssignmentId);
+    // const taskAssignment = await this.taskAssignmentModel.findById(taskAssignmentId); 
+
+    const taskAssignment = await this.taskAssignmentModel
+    .findById(taskAssignmentId)
+    .populate({
+      path: 'task', // Assuming 'task' is the reference field in TaskAssignment
+      populate: {
+        path: 'packageId', // Assuming 'package' is the reference field in Task
+        model: 'Package', // The model name for packages
+      },
+    });
+
+    console.log(taskAssignment, "ffddssaakklljj"); 
 
     if (!taskAssignment) {
+      console.log('Task assignment not found');
       throw new Error('Task assignment not found');
     }
+
+    // Get priceEarnedPerTaskDone from the populated package
+    const task: any = taskAssignment.task;
+    console.log(task, "task is here..........")
+    if (!task || !task.packageId) {
+      console.log('Task or Package not found');
+      throw new Error('Task or Package not found');
+    }
+
+    const rewardAmount = task.packageId.priceEarnedPerTaskDone;
+
+    console.log(rewardAmount, "there is a reward==============?")
 
     // Update the picture and mark the status as 'completed'
     taskAssignment.picture = picture;
     taskAssignment.status = 'completed';
     taskAssignment.endTime = `${new Date()}`; // Set the end time
     await taskAssignment.save();
+
+    // Update user's wallet balance
+    const userId = taskAssignment.user;
+    const wallet = await Wallet.findOne({ user: userId });
+
+    if (!wallet) {
+      console.log('Wallet not found for user');
+      throw new Error('Wallet not found for user');
+    }
+
+    wallet.balance += rewardAmount;
+    await wallet.save();
 
     return taskAssignment;
   }

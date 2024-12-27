@@ -10,7 +10,7 @@ const CommissionsPage = () => {
       <ReturnHeader 
           headerName='Mes Gains'
           returnBtnLabel='Retour'
-          returnLink='/backoffice'
+          returnLink='/backoffice/wallet'
       />
       <CommissionModule />
     </div>

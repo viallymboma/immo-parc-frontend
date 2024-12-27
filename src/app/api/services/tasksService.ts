@@ -3,11 +3,14 @@ import Package from '../models/Package';
 import Task from '../models/Task';
 
 export const getTasksForUser = async (userId: string) => {
-  // Fetch the user and their subscribed package
+    console.log(userId, "llllllllkkkkkkkkkk"); 
+    // Fetch the user and their subscribed package
     const user = await User
         .findById(userId)
         .populate('package', 'listOfTasks')
         .exec();
+
+    console.log(user, "llllllllkkuserkkkkkkkk"); 
 
     if (!user || !user.package) {
         throw new Error('User or user package not found');

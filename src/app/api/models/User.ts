@@ -22,6 +22,7 @@ export interface IUser extends Document {
     status?: 'active' | 'inactive';
     package?: Types.ObjectId | null;
     internshipExpiry?: Date;
+    userWallet?: Types.ObjectId | null;
     error?: string;
 }
 
@@ -49,7 +50,9 @@ const UserSchema = new Schema<IUser>(
             default: 'regular_user',
         },
         status: { type: String, enum: ['active', 'inactive'], default: 'active' },
-        package: { type: Types.ObjectId, ref: 'Package', required: false },
+        package: { type: Types.ObjectId, ref: 'Package', required: false }, 
+        // Other fields remain the same
+        userWallet: { type: Types.ObjectId, ref: 'Wallet', required: false },
         internshipExpiry: { type: Date },
     },
     {

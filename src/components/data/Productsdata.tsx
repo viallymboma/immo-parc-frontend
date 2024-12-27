@@ -26,7 +26,7 @@ export const walletNavElement: WalletElemenetType [] = [
         // ), 
         amount: 50000, 
         tooltip: "Total des gains", 
-        route: "/dashboard/transactions/commissions"
+        route: "/backoffice/transactions/commissions"
     }, 
     {
         id: 2,
@@ -35,7 +35,7 @@ export const walletNavElement: WalletElemenetType [] = [
         // ), 
         amount: 50000, 
         tooltip: "Totals des retraits", 
-        route: "/dashboard/transactions/withdrawals"
+        route: "/backoffice/transactions/withdrawals"
     }, 
     {
         id: 3,
@@ -44,7 +44,7 @@ export const walletNavElement: WalletElemenetType [] = [
         // ), 
         amount: 50000, 
         tooltip: "Total des recharges", 
-        route: "/dashboard/transactions/funding-account/"
+        route: "/backoffice/transactions/funding-account/"
     }, 
     // {
     //     id: 4,

@@ -3,7 +3,7 @@
 // import { UsersDocument } from '@/models/user.entity';
 import mongoose, { Model } from 'mongoose';
 
-import { Wallet } from '../models';
+// import { Wallet } from '../models';
 import { ITask } from '../models/Task';
 import { ITaskAssignment } from '../models/TaskAssignment';
 import { IUser } from '../models/User';
@@ -216,16 +216,16 @@ export class TaskAssignmentService {
     await taskAssignment.save();
 
     // Update user's wallet balance
-    const userId = taskAssignment.user;
-    const wallet = await Wallet.findOne({ user: userId });
+    // const userId = taskAssignment.user;
+    // const wallet = await Wallet.findOne({ user: userId });
 
-    if (!wallet) {
-      console.log('Wallet not found for user');
-      throw new Error('Wallet not found for user');
-    }
+    // if (!wallet) {
+    //   console.log('Wallet not found for user');
+    //   throw new Error('Wallet not found for user');
+    // }
 
-    wallet.balance += rewardAmount;
-    await wallet.save();
+    // wallet.balance += rewardAmount;
+    // await wallet.save();
 
     return taskAssignment;
   }

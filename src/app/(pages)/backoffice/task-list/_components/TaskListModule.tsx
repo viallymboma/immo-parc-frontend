@@ -32,7 +32,7 @@ const TaskListModule = () => {
     const counts = filteredTasksFromBackend?.reduce(
         (acc, task) => {
             if (task.status === "completed") acc.completed++;
-            if (task.status === "pending") acc.pending++;
+            if (task.status === "pending" || task.status === "in-progress") acc.pending++;
             return acc;
         },
         { completed: 0, pending: 0 }

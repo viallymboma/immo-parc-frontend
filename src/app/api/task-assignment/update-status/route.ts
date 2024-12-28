@@ -5,7 +5,7 @@ import {
 
 import { TaskAssignmentService } from '../../services/task-assignment.service';
 
-export const runtime = "edge"
+// export const runtime = "edge"
 
 const taskAssignmentService = new TaskAssignmentService();
 

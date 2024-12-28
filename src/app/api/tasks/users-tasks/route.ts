@@ -25,6 +25,11 @@ export async function GET(req: NextRequest) {
         const userInfo: any = await verifyJWT(token);
         console.log(userInfo, "iiiiiiiiiiiiiiiiiiiiiii")
 
+        const url = new URL(req.url);
+        // Get page and limit from query params
+        const page = parseInt(url.searchParams.get('page') || '1', 10);
+        const limit = parseInt(url.searchParams.get('limit') || '10', 10);
+
         if (userInfo.role === 'super_admin') {
             const tasks = await getAllTasks ()
             return NextResponse.json(tasks);
@@ -32,7 +37,8 @@ export async function GET(req: NextRequest) {
 
         const tasks = await getTasksForUser(userInfo._id);
 
-        return NextResponse.json(tasks);
+        // return NextResponse.json(tasks);
+        return NextResponse.json({ tasks, page, limit });
 
     } catch (error: any) {
 

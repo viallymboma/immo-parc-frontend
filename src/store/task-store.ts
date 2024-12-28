@@ -17,6 +17,8 @@ interface TaskState {
   filteredTasks?: TaskDataType[]; // Array of selected tasks
   filteredTasksFromBackend?: TaskDataType[]; // Array of selected tasks
   allSelecTasksForUsers?: TaskDataType[];
+  taskPage?: number; 
+  tasksNumberPerPage?: number; 
   setTasks: (tasks_: TaskDataType[]) => void; // Load all tasks
   toggleTaskSelection: (id: number | string, numberOfTaskPerDay: number) => void; // Add or remove a task from the selection
   toggleTaskSelectionV2: (id: number | string, numberOfTaskPerDay: number, userId: string) => void; // Add or remove a task from the selection
@@ -24,6 +26,7 @@ interface TaskState {
   setAllSelectedTaskFromBack: (allSelecTasksForUsers: TaskDataType) => void;
   toggleCategory: (category: string, taskAssignment: TaskDataType[]) => void; 
   clearTaskSelection: () => void; // Clear all selected tasks
+  setTaskNumberAndPage: (taskPage: number, tasksNumberPerPagetaskPage: number) => void; 
   selectTask: (id: number | string) => void; // Select a specific task by ID
   submitTask: () => void; // Mark the selected task as submitted
 }
@@ -36,6 +39,8 @@ export const useTaskStore = create<TaskState>((set, get) => {
     selectedTasks: get()?.selectedTasks || [], // Array of selected tasks
     filteredTasksFromBackend: get()?.filteredTasksFromBackend || [],
     allSelecTasksForUsers: get()?.allSelecTasksForUsers || [],
+    taskPage: 1, 
+    tasksNumberPerPage: 10, 
 
     // Load all tasks
     setTasks: (tasks) =>
@@ -48,6 +53,15 @@ export const useTaskStore = create<TaskState>((set, get) => {
             ...task,
             isSelected: selectedTaskIds.includes(task._id) || task.isSelected || false, // Mark as selected if in selectedTasks
           })),
+        };
+      }),
+
+    // Load all tasks
+    setTaskNumberAndPage: (taskPage, tasksNumberPerPagetaskPage) =>
+      set(() => {
+        return {
+          taskPage,
+          tasksNumberPerPagetaskPage,
         };
       }),
 

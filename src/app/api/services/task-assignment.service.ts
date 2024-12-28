@@ -21,27 +21,56 @@ export class TaskAssignmentService {
     this.taskModel = mongoose.models.Task || mongoose.model<ITask>('Task');
   }
 
-  async getTasksForUser(userId: string): Promise<ITaskAssignment[]> {
+  // async getTasksForUser(userId: string): Promise<ITaskAssignment[]> {
+  //   const today = new Date();
+  //   const startOfDay = new Date(today.setHours(0, 0, 0, 0));
+  //   const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+
+  //   const taskAssignments = await this.taskAssignmentModel
+  //     .find({
+  //       user: userId,
+  //       createdAt: { $gte: startOfDay, $lte: endOfDay }, // Filter by today's date
+  //     })
+  //     .populate({
+  //       path: 'task', 
+  //       populate: 'packageId'
+  //     })
+  //     .populate({
+  //       path: 'user',
+  //       model: 'User'
+  //     });
+
+  //   return taskAssignments;
+  // }
+
+  async getTasksForUser(
+    userId: string,
+    page: number = 1,
+    limit: number = 10
+  ): Promise<ITaskAssignment[]> {
     const today = new Date();
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));
     const endOfDay = new Date(today.setHours(23, 59, 59, 999));
-
+  
     const taskAssignments = await this.taskAssignmentModel
       .find({
         user: userId,
-        createdAt: { $gte: startOfDay, $lte: endOfDay }, // Filter by today's date
+        createdAt: { $gte: startOfDay, $lte: endOfDay },
       })
       .populate({
-        path: 'task', 
-        populate: 'packageId'
+        path: 'task',
+        populate: 'packageId',
       })
       .populate({
         path: 'user',
-        model: 'User'
-      });
-
+        model: 'User',
+      })
+      .skip((page - 1) * limit)
+      .limit(limit); // Add pagination
+  
     return taskAssignments;
   }
+  
 
   async getAllTasksForUser(userId: string): Promise<ITaskAssignment[]> {
     // const today = new Date();

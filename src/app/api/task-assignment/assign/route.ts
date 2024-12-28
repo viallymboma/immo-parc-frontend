@@ -5,6 +5,10 @@ import {
 
 import { TaskAssignmentService } from '../../services/task-assignment.service';
 
+export const config = {
+  runtime: 'edge', // Specify Edge Runtime
+};
+
 // import { TaskAssignmentService } from '@/services/task-assignment.service'; // Adjust import based on your structure
 
 const taskAssignmentService = new TaskAssignmentService();

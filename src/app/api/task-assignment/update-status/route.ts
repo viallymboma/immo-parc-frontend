@@ -5,6 +5,10 @@ import {
 
 import { TaskAssignmentService } from '../../services/task-assignment.service';
 
+export const config = {
+    runtime: 'edge', // Specify Edge Runtime
+};
+
 const taskAssignmentService = new TaskAssignmentService();
 
 export async function POST(request: NextRequest) {

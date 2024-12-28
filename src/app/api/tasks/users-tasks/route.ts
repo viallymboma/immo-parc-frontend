@@ -10,14 +10,9 @@ import {
   getTasksForUser,
 } from '../../services/tasksService';
 
-// import {
-//   getAllTasks,
-//   getTasksForUser,
-// } from '../services/tasksService';
-
-// import { TasksService } from '../services/tasksService';
-// import { tasksService } from '@/services/tasksService'; // Import service
-// import { verifyJWT } from '@/utils/jwt'; // Utility to verify JWT
+export const config = {
+    runtime: 'edge', // Specify Edge Runtime
+};
 
 export async function GET(req: NextRequest) {
 

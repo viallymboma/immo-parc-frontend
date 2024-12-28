@@ -7,6 +7,10 @@ import { JwtService } from '@nestjs/jwt';
 
 import { TaskAssignmentService } from '../../services/task-assignment.service';
 
+export const config = {
+    runtime: 'edge', // Specify Edge Runtime
+};
+
 const jwtService = new JwtService({ secret: 'your_jwt_secret' }); // Replace with your actual JWT secret
 const taskAssignmentService = new TaskAssignmentService();
 

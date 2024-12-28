@@ -1,0 +1,7 @@
+{
+    "functions": {
+        "api/tasks/users-tasks": { "runtime": "edge" },
+        "api/task-assignment/user-tasks": { "runtime": "edge" },
+        "api/task-assignment/user-all-tasks": { "runtime": "edge" }
+    }
+}

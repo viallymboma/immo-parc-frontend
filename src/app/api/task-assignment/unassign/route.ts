@@ -5,9 +5,7 @@ import {
 
 import { TaskAssignmentService } from '../../services/task-assignment.service';
 
-export const config = {
-    runtime: 'edge', // Specify Edge Runtime
-};
+export const runtime = "edge"
 
 const taskAssignmentService = new TaskAssignmentService();
 

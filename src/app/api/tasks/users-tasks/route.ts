@@ -10,9 +10,7 @@ import {
   getTasksForUser,
 } from '../../services/tasksService';
 
-export const config = {
-    runtime: 'edge', // Specify Edge Runtime
-};
+export const runtime = "edge"
 
 export async function GET(req: NextRequest) {
 

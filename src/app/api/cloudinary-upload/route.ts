@@ -5,12 +5,9 @@ import { TaskAssignmentService } from '../services/task-assignment.service';
 
 // Configure Cloudinary
 cloudinary.config({
-    // cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-    // api_key: process.env.CLOUDINARY_API_KEY,
-    // api_secret: process.env.CLOUDINARY_API_SECRET,
-    cloud_name: "dkdtowap9",
-    api_key: "495418925199369",
-    api_secret: "AOpFjOHadVyUoGJUV_6M27HK3oc",
+    cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
+    api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_K,
+    api_secret: process.env.NEXT_PUBLIC_CLOUDINARY_API_SEC,
 });
 
 // Create the service instance
@@ -32,17 +29,22 @@ export async function POST(req: Request) {
             );
         }
 
+        console.log("HAS PASSED THE CHECK"); 
+
         // Convert the file into a temporary path
         const arrayBuffer = await image.arrayBuffer();
         const buffer = Buffer.from(arrayBuffer);
         const tempFilePath = `/tmp/${image.name}`;
-        console.log(arrayBuffer, buffer, "just checking===========>")
         await require('fs/promises').writeFile(tempFilePath, buffer);
+        console.log(arrayBuffer, buffer, tempFilePath, "just checking===========>")
 
         // Upload the file to Cloudinary
         const uploadResult = await cloudinary.uploader.upload(tempFilePath, {
-            folder: 'task_images',
+            folder: 'task_images', 
+            timeout: 60000, // 60 seconds
         });
+
+        console.log(uploadResult, "THE uploadResult")
 
         const picture = {
             name: uploadResult.original_filename,
@@ -56,13 +58,16 @@ export async function POST(req: Request) {
             picture
         );
 
+        await require('fs/promises').unlink(tempFilePath);
+
         // Respond with success
         return NextResponse.json({
             message: 'Tâche terminée avec succès',
             data: updatedTaskAssignment,
         });
     } catch (error: any) {
-        return NextResponse.json({ message: error.message }, { status: 500 });
+        console.log(error, "THE ERROR")
+        return NextResponse.json({ message: error }, { status: 500 });
     }
 }
 

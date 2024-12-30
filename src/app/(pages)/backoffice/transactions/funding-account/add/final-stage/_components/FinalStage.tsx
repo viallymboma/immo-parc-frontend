@@ -5,17 +5,21 @@ import {
   useRouter,
   useSearchParams,
 } from 'next/navigation';
+import toast from 'react-hot-toast';
 
 import {
   allAccounts,
   AllAccountsType,
 } from '@/components/data/Productsdata';
 import { SettingHorizontalSvgIcon } from '@/components/svgs/SvgIcons';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 const FinalStageModule = () => {
   const searchParams = useSearchParams (); 
+  const { user } = useUserInfo ()
   const router = useRouter () 
   const [amount, setAmount] = React.useState("");
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const [mobileNumber, setMobileNumber] = React.useState("");
   const [operator, setOperator] = React.useState<AllAccountsType>({});
   const [transactionId, setTransactionId] = React.useState<string>(""); 
@@ -55,13 +59,49 @@ const FinalStageModule = () => {
     setSelectedTransactionIDError("")
   }
 
-  const submitSelection = (e: any) => {
+  const submitSelection = async (e: any) => {
     e.preventDefault(); 
-    if (selectedTransactionIDError! === undefined || selectedTransactionIDError! === "" ) {
-      setSelectedTransactionIDError ("Vous devez ajouter un identifiant de transaction depuis votre SMS")
+    setIsLoading (true)
+    console.log(selectedTransactionIDError, "nice nice nice", transactionId)
+    // if (selectedTransactionIDError !== undefined || selectedTransactionIDError !== "" ) {
+    //   setSelectedTransactionIDError ("Vous devez ajouter un identifiant de transaction depuis votre SMS"); 
+    //   setIsLoading (false); 
+    //   return null
+    // }
+    if (transactionId === undefined || transactionId === "" ) {
+      setSelectedTransactionIDError ("Vous devez ajouter un identifiant de transaction depuis votre SMS"); 
+      setIsLoading (false); 
       return null
     }
-    router.push(`/backoffice/transactions/funding-account`); 
+    try {
+      const response = await fetch('/api/transactions/funding', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              userId: user?.userInfo?._id, // Replace with actual user ID
+              walletId: user?.userInfo?.userWallet?._id, // Replace with actual wallet ID
+              transactionId: transactionId, // Mobile Money transaction ID
+              amount: parseFloat(amount),
+          }),
+      });
+
+      const result = await response.json();
+
+      if (!response.ok) {
+        toast.error("Échec de la création de la transaction de financement")
+        throw new Error(result.error || 'Failed to create funding transaction');
+      }
+
+      // alert('Funding transaction successful!');
+      toast.success("Transaction de financement réussie !"); 
+      router.push(`/backoffice/transactions/funding-account`); 
+    } catch (error: any) {
+      toast.success(`Error: ${error.message}`); 
+      // alert(`Error: ${error.message}`);
+    } finally {
+      setIsLoading (false); 
+    }
+    
   }
 
   if (!isHydrated) {
@@ -139,7 +179,7 @@ const FinalStageModule = () => {
             type="submit"
             className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90"
         >
-            Valider
+            { isLoading ? "En cours..." : "Valider" }
         </button>
       </div>
       <div>

@@ -10,7 +10,7 @@ const WalletPage = () => {
       <ReturnHeader 
           headerName='Mon Portefeuille'
           returnBtnLabel='Retour'
-          returnLink='/dashboard'
+          returnLink='/backoffice'
       />
       <WalletModule />
     </div>

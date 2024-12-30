@@ -19,11 +19,28 @@ interface TaskState {
   allSelecTasksForUsers?: TaskDataType[];
   taskPage?: number; 
   tasksNumberPerPage?: number; 
+  totalEarnings?: number, 
+  totalEarningsToday?: number, 
+  completedTasks?: TaskDataType[], 
+  todayCompletedTasks?: TaskDataType[], 
+  packageAmounts?: any, 
+  selectedPackageAmounts?: any, 
   setTasks: (tasks_: TaskDataType[]) => void; // Load all tasks
   toggleTaskSelection: (id: number | string, numberOfTaskPerDay: number) => void; // Add or remove a task from the selection
   toggleTaskSelectionV2: (id: number | string, numberOfTaskPerDay: number, userId: string) => void; // Add or remove a task from the selection
   setSelectedTaskFromBack: (filteredTasks: TaskDataType) => void;
-  setAllSelectedTaskFromBack: (allSelecTasksForUsers: TaskDataType) => void;
+  setPackageAmountsFromBack: (packageAmounts: any []) => void; 
+  setSelectedPackageAmount?: (selectedPackageAmounts: number) => void; 
+  setAllSelectedTaskFromBack: ({ 
+    allSelecTasksForUsers, 
+    completedTasks, 
+    todayCompletedTasks, totalEarnings, totalEarningsToday }: { 
+      allSelecTasksForUsers?: TaskDataType, 
+      completedTasks?: TaskDataType, 
+      todayCompletedTasks?: TaskDataType, 
+      totalEarnings?: number, 
+      totalEarningsToday?: number, 
+    }) => void;
   toggleCategory: (category: string, taskAssignment: TaskDataType[]) => void; 
   clearTaskSelection: () => void; // Clear all selected tasks
   setTaskNumberAndPage: (taskPage: number, tasksNumberPerPagetaskPage: number) => void; 
@@ -41,6 +58,28 @@ export const useTaskStore = create<TaskState>((set, get) => {
     allSelecTasksForUsers: get()?.allSelecTasksForUsers || [],
     taskPage: 1, 
     tasksNumberPerPage: 10, 
+    completedTasks: get()?.completedTasks || [], 
+    todayCompletedTasks: get()?.todayCompletedTasks || [], 
+    totalEarnings: get()?.totalEarnings || 0, 
+    totalEarningsToday: get()?.totalEarningsToday || 0, 
+    packageAmounts: get()?.packageAmounts || 0, 
+    selectedPackageAmounts: get()?.selectedPackageAmounts || 0,
+
+    setPackageAmountsFromBack: (packageAmounts: any []) =>
+      set((state) => {
+        return {
+          ...state,
+          packageAmounts, 
+        };
+      }),
+
+    setSelectedPackageAmount: (selectedPackageAmounts: number) =>
+      set((state) => {
+        return {
+          ...state,
+          selectedPackageAmounts, 
+        };
+      }),
 
     // Load all tasks
     setTasks: (tasks) =>
@@ -58,8 +97,9 @@ export const useTaskStore = create<TaskState>((set, get) => {
 
     // Load all tasks
     setTaskNumberAndPage: (taskPage, tasksNumberPerPagetaskPage) =>
-      set(() => {
+      set((state) => {
         return {
+          ...state,
           taskPage,
           tasksNumberPerPagetaskPage,
         };
@@ -93,12 +133,18 @@ export const useTaskStore = create<TaskState>((set, get) => {
         };
       }),
 
-    setAllSelectedTaskFromBack: (allSelecTasksForUsers: any) =>
+    setAllSelectedTaskFromBack: ({ 
+      allSelecTasksForUsers, 
+      completedTasks, 
+      todayCompletedTasks, totalEarnings, totalEarningsToday }: any) =>
       set((state) => {
-        console.log(allSelecTasksForUsers, "in the store==============>")
         return {
-          ...state,
-          allSelecTasksForUsers,
+          ...state, 
+          allSelecTasksForUsers, 
+          completedTasks, 
+          todayCompletedTasks, 
+          totalEarnings, 
+          totalEarningsToday, 
           // filteredTasks: allSelecTasksForUsers, 
         };
       }),

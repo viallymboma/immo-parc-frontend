@@ -45,7 +45,8 @@ export async function POST(request: Request) {
       // secure: true,
       // maxAge: 24 * 60 * 60 * 1000, // Set expiration for the cookie (1 day in ms)
       // maxAge: 3600000, // Cookie expiration time (e.g., 1 hour)
-      maxAge: 5 * 60, // 5 minutes in seconds
+      maxAge: 20 * 60, // 5 minutes in seconds
+      // maxAge: 24 * 60 * 60, // Set expiration for the cookie (24 hours in seconds)
       // sameSite: 'strict', // Restrict cookie usage to same site
     });
 

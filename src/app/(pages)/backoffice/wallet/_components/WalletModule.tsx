@@ -5,10 +5,6 @@ import React from 'react';
 import Link from 'next/link';
 
 import {
-  WalletElemenetType,
-  walletNavElement,
-} from '@/components/data/Productsdata';
-import {
   BlockedEyeSvgIcon,
   ChevronRightSvgIcon,
   EyeSvgIcon,
@@ -16,11 +12,13 @@ import {
   TotalActifSvgIcon,
 } from '@/components/svgs/SvgIcons';
 import useFetchAllTasksAssigment from '@/hooks/useFetchAllTasksAssigment';
+import { useTaskStore } from '@/store/task-store';
 
 const WalletModule = () => {
     const [ display, setDisplay ] = React.useState<boolean> (false); 
     const [ displayText, setDisplayText ] = React.useState<string> ("Afficher"); 
     const { allTaskAssignment, isValidating, refetchAllTaskAssignments } = useFetchAllTasksAssigment (); 
+    const { totalEarningsToday, totalEarnings, completedTasks, todayCompletedTasks,  } = useTaskStore(); 
 
     console.log(allTaskAssignment, "rrrrrrrrrrrrrrr")
 
@@ -46,15 +44,15 @@ const WalletModule = () => {
         </div>
         <div>
           <h1 className="text-lg font-semibold">Portefeuille Revenus</h1>
-          <p className="text-2xl font-bold">0.00 FCFA</p>
+          <p className="text-2xl font-bold">{ totalEarnings } FCFA</p>
         </div>
       </div>
 
       <div className='flex flex-row justify-between'>
-        <Link className=' bg-sky-300 text-white rounded-2xl px-4 py-2' href="/dashboard/transactions/funding-account/add">
+        <Link className=' bg-sky-300 text-white rounded-2xl px-4 py-2' href="/backoffice/transactions/funding-account/add">
           Recharge
         </Link>
-        <Link className=' bg-sky-300 text-white rounded-2xl px-4 py-2' href="/dashboard/transactions/withdrawals/add">
+        <Link className=' bg-sky-300 text-white rounded-2xl px-4 py-2' href="/backoffice/transactions/withdrawals/add">
           Retrait
         </Link>
       </div>
@@ -83,7 +81,7 @@ const WalletModule = () => {
               <h1 className='text-black'>
                 {
                   display ? 
-                    `0.00 FCFA`
+                    `${ totalEarnings } FCFA`
                     :
                     "*******"
                 }
@@ -95,7 +93,7 @@ const WalletModule = () => {
               <h1 className='text-black'>
                 {
                   display ? 
-                    `0.00 FCFA`
+                    `${ totalEarningsToday } FCFA`
                     :
                     "*******"
                 }
@@ -105,7 +103,7 @@ const WalletModule = () => {
         </div>
       </div>
       <div className='flex flex-col gap-3 '>
-        {
+        {/* {
             walletNavElement?.map((element: WalletElemenetType, index: number) => {
                 return (
                     <Link key={`${ element?.id } - ${ index }`} href={`${ element?.route }`} className='flex flex-row justify-between py-3 rounded-md border-b-1 border-b-slate-200'>
@@ -119,7 +117,34 @@ const WalletModule = () => {
                     </Link>
                 )
             })
-        }
+        } */}
+        <Link href={`/backoffice/transactions/commissions`} className='flex flex-row justify-between py-3 rounded-md border-b-1 border-b-slate-200'>
+          <h1>Total des gains</h1>
+          <div className='flex flex-row items-center'>
+            <span className=''>
+              { totalEarnings }
+            </span>
+            <ChevronRightSvgIcon />
+          </div>
+        </Link>
+        <Link href={`/backoffice/transactions/withdrawals`} className='flex flex-row justify-between py-3 rounded-md border-b-1 border-b-slate-200'>
+          <h1>Totals des retraits</h1>
+          <div className='flex flex-row items-center'>
+            <span className=''>
+              0
+            </span>
+            <ChevronRightSvgIcon />
+          </div>
+        </Link>
+        <Link href={`/backoffice/transactions/funding-account/`} className='flex flex-row justify-between py-3 rounded-md border-b-1 border-b-slate-200'>
+          <h1>Total des recharges</h1>
+          <div className='flex flex-row items-center'>
+            <span className=''>
+              0
+            </span>
+            <ChevronRightSvgIcon />
+          </div>
+        </Link>
       </div>
     </div>
   )

@@ -9,6 +9,8 @@ import {
 // Define the TypeScript interface for Transactions
 export interface ITransactions extends Document {
   user: Types.ObjectId; // Reference to User
+  walletId: Types.ObjectId; 
+  transactionId: string; 
   type: 'funding' | 'withdrawal' | 'earning'; // Type of transaction
   amount: number; // Transaction amount
   status: 'pending' | 'completed' | 'rejected'; // Status of the transaction
@@ -17,7 +19,9 @@ export interface ITransactions extends Document {
 // Define the Mongoose schema for Transactions
 const TransactionsSchema = new Schema<ITransactions>(
     {
-        user: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+        user: { type: Schema.Types.ObjectId, ref: 'User', required: true }, 
+        walletId: { type: Schema.Types.ObjectId, ref: 'Wallet', required: true },
+        transactionId: { type: String, required: false }, // Mobile Money transaction ID
         type: {
             type: String,
             enum: ['funding', 'withdrawal', 'earning'],

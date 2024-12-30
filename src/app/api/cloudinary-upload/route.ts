@@ -41,7 +41,7 @@ export async function POST(req: Request) {
         // Upload the file to Cloudinary
         const uploadResult = await cloudinary.uploader.upload(tempFilePath, {
             folder: 'task_images', 
-            timeout: 60000, // 60 seconds
+            // timeout: 60000, // 60 seconds
         });
 
         console.log(uploadResult, "THE uploadResult")

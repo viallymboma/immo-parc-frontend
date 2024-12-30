@@ -10,8 +10,13 @@ import {
   SuggestedAmounts,
 } from '@/components/data/Productsdata';
 import { TotalActifSvgIcon } from '@/components/svgs/SvgIcons';
+import { useUserInfo } from '@/hooks/useUserInfo';
 
 const FundingForm = () => {
+
+  const { user } = useUserInfo ()
+
+  console.log(parseInt(`237${user?.userInfo?.phone}`), "userslllllllll")
 
   const [ selectedAmount, setSelectedAmount ] = React.useState<number>(0); 
   const [ selectedAmountError, setSelectedAmountError ] = React.useState<string>(""); 
@@ -51,7 +56,8 @@ const FundingForm = () => {
       return null
     }
 
-    router.push(`/dashboard/transactions/funding-account/add/final-stage?amount=${ selectedAmount }&number=${ myAccountMobileNumber }&operator=${ selectedAccount }`); 
+    // router.push(`/backoffice/transactions/funding-account/add/final-stage?amount=${ selectedAmount }&number=${ parseInt(`237${user?.userInfo?.phone}`) }&operator=${ selectedAccount }`); 
+    router.push(`/backoffice/transactions/funding-account/add/final-stage?amount=${ selectedAmount }&number=${ myAccountMobileNumber }&operator=${ selectedAccount }`); 
   }
 
   return (

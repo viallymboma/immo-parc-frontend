@@ -12,13 +12,14 @@ const fetcher = async (url: string) => {
 };
 
 const useFetchAllTasksAssigment = () => {
-    const { setSelectedTaskFromBack } = useTaskStore();
+    const { setAllSelectedTaskFromBack } = useTaskStore();
     const { data, error, isValidating, mutate } = useSWR(`${BASE_API_URL}/task-assignment/user-all-tasks`, fetcher, {
         onSuccess: (taskAssignments) => {
             // TRANSFORM DATA HERE 
-            // console.log("here in useFetchAllTasksAssigment onSuccess", taskAssignments)
+            console.log("here in useFetchAllTasksAssigment onSuccess", taskAssignments)
             const transformTask = taskAssignments?.tasks?.map((task: any) => {
                 return {
+                    // ...taskAssignments, 
                     ...task.task, 
                     taskAssignmentId: task?._id,
                     status: task?.status, 
@@ -26,7 +27,13 @@ const useFetchAllTasksAssigment = () => {
             })
             // console.log(transformTask, "in the rquest")
             // Update Zustand store when data is fetched
-            setSelectedTaskFromBack(transformTask || []);
+            setAllSelectedTaskFromBack({
+                allSelecTasksForUsers: transformTask || [], 
+                completedTasks: taskAssignments?.completedTasks, 
+                todayCompletedTasks: taskAssignments?.todayCompletedTasks, 
+                totalEarnings: taskAssignments?.totalEarnings, 
+                totalEarningsToday: taskAssignments?.totalEarningsToday
+            });
         },
         refreshInterval: 0, // Disable periodic revalidation
         revalidateOnFocus: false,

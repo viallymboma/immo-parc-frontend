@@ -106,16 +106,22 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
         formData.append('taskAssignmentId', task?.taskAssignmentId || ""); // Add taskAssignmentId
 
         try {
+
             const response = await fetch('/api/cloudinary-upload', {
                 method: 'POST',
                 body: formData,
             });
 
+            // console.log(response, "yyyyyyyyyyy")
             if (!response.ok) {
-                throw new Error('Failed to upload image');
+                const res = await response.json(); 
+                console.log(res, "yyyyyyresyyyyy"); 
+                throw new Error('Failed to upload image'); 
             }
 
             const result = await response.json();
+
+            console.log(result, "this is the result=======>")
 
             try {
                 await Promise.all([refetchTasks(), refetchTaskAssignments()]);
@@ -130,6 +136,7 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
             console.log(result); // Contains the server response
         } catch (error) {
             console.error(error);
+            toast.error(`${error}`)
             // alert('Error uploading image');
         } finally {
             setUploading(false);
@@ -313,6 +320,82 @@ export default TaskDetailCard;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// {
+//     "message": "Tâche terminée avec succès",
+//     "data": {
+//         "picture": {
+//             "name": "Screenshot from 2024-12-29 04-07-19",
+//             "public_id": "task_images/utdl4oudem8mridxp1iw",
+//             "url": "https://res.cloudinary.com/dkdtowap9/image/upload/v1735442553/task_images/utdl4oudem8mridxp1iw.png"
+//         },
+//         "_id": "6770aee140265ff84925ee28",
+//         "user": "676ed1e9c3d355b932b6e626",
+//         "task": {
+//             "_id": "675d8d2d754f14b62aa05831",
+//             "taskTitle": "Join Online Forum",
+//             "taskMission": "Register & Post",
+//             "taskShortInstruction": "Demande: Rejoignez le forum et postez un message",
+//             "taskDescription": "Créez un compte sur le forum, publiez un message dans une section pertinente, puis capturez une preuve.",
+//             "taskLink": "https://www.youtube.com/watch?v=t8kyljswKrk",
+//             "taskCategory": "video",
+//             "imageUrl": null,
+//             "taskStatus": "unassigned",
+//             "assignedTo": [],
+//             "completedBy": [],
+//             "packageId": {
+//                 "_id": "6755d9705e0073d8be0b1461",
+//                 "name": "Agent Eco niveau 0",
+//                 "level": 0,
+//                 "inverstment": 1,
+//                 "numberOfTaskPerDay": 5,
+//                 "priceEarnedPerTaskDone": 80,
+//                 "priceEarnedForAllTaskDonePerDay": 480,
+//                 "priceEarnedForAllTaskDonePerMonth": 1,
+//                 "priceEarnedForAllTaskDonePerYear": 1,
+//                 "description": "",
+//                 "createdAt": "2024-12-08T17:37:52.427Z",
+//                 "updatedAt": "2024-12-14T13:52:08.208Z",
+//                 "__v": 8,
+//                 "listOfTasks": [
+//                     "675d8cd3754f14b62aa0582d",
+//                     "675d8d2d754f14b62aa05831",
+//                     "675d8d36754f14b62aa05835",
+//                     "675d8d40754f14b62aa05839",
+//                     "675d8d52754f14b62aa0583d",
+//                     "675d8d73754f14b62aa05841",
+//                     "675d8d7d754f14b62aa05845",
+//                     "675d8d87754f14b62aa05849"
+//                 ]
+//             },
+//             "createdAt": "2024-12-14T13:50:37.405Z",
+//             "updatedAt": "2024-12-14T13:50:37.405Z",
+//             "__v": 0
+//         },
+//         "status": "completed",
+//         "createdAt": "2024-12-29T02:07:29.498Z",
+//         "updatedAt": "2024-12-29T03:22:34.391Z",
+//         "__v": 0,
+//         "startTime": "Sun Dec 29 2024 04:21:23 GMT+0100 (West Africa Standard Time)",
+//         "endTime": "Sun Dec 29 2024 04:22:34 GMT+0100 (West Africa Standard Time)"
+//     }
+// }
 
 
 

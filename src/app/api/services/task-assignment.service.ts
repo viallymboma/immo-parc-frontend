@@ -3,7 +3,10 @@
 // import { UsersDocument } from '@/models/user.entity';
 import mongoose, { Model } from 'mongoose';
 
-// import { Wallet } from '../models';
+import {
+  Transactions,
+  Wallet,
+} from '../models';
 import { ITask } from '../models/Task';
 import { ITaskAssignment } from '../models/TaskAssignment';
 import { IUser } from '../models/User';
@@ -142,9 +145,6 @@ export class TaskAssignmentService {
     // Schedule status update for this assignment
     TaskSchedulerService.scheduleTaskStatusUpdate(assignment?._id?.toString());
 
-    // task.taskStatus = 'assigned';
-    // await task.save();
-
     user.selectedTasksCount += 1;
     await user.save();
 
@@ -217,9 +217,19 @@ export class TaskAssignmentService {
         path: 'packageId', // Assuming 'package' is the reference field in Task
         model: 'Package', // The model name for packages
       },
+    })
+    .populate({
+      path: 'user', // Assuming 'task' is the reference field in TaskAssignment
+      populate: [{
+          path: 'children', // Assuming 'children' is the reference field in Task
+          model: 'User', // The model name for User
+        }, 
+        {
+          path: 'userWallet', // Assuming 'userWallet' is the reference field in Task
+          model: 'Wallet', // The model name for wallet
+        }, 
+      ],
     });
-
-    console.log(taskAssignment, "ffddssaakklljj"); 
 
     if (!taskAssignment) {
       console.log('Task assignment not found');
@@ -245,16 +255,30 @@ export class TaskAssignmentService {
     await taskAssignment.save();
 
     // Update user's wallet balance
-    // const userId = taskAssignment.user;
-    // const wallet = await Wallet.findOne({ user: userId });
+    const userId = taskAssignment.user;
+    const wallet = await Wallet.findOne({ user: userId });
 
-    // if (!wallet) {
-    //   console.log('Wallet not found for user');
-    //   throw new Error('Wallet not found for user');
-    // }
+    if (!wallet) {
+      console.log('Wallet not found for user');
+      throw new Error('Wallet not found for user');
+    }
 
-    // wallet.balance += rewardAmount;
-    // await wallet.save();
+    wallet.balance += rewardAmount;
+    await wallet.save();
+
+    console.log(wallet, "the wallet")
+
+    // Create a transaction
+    const transaction = new Transactions({
+      user: userId,
+      walletId: wallet?._id?.toString (),
+      type: 'earning', // Indicating the transaction is an earning
+      amount: rewardAmount,
+      status: 'completed', // Mark the transaction as completed
+    });
+    console.log(transaction, "the transaction")
+
+    await transaction.save();
 
     return taskAssignment;
   }

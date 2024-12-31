@@ -3,6 +3,8 @@
 // import { UsersDocument } from '@/models/user.entity';
 import mongoose, { Model } from 'mongoose';
 
+import { connectToDatabase } from '@/app/lib/mongodb';
+
 import {
   Transactions,
   Wallet,
@@ -26,7 +28,9 @@ export class TaskAssignmentService {
   async getTasksForUser(userId: string): Promise<ITaskAssignment[]> {
     const today = new Date();
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999)); 
+
+    await connectToDatabase (); 
 
     const taskAssignments = await this.taskAssignmentModel
       .find({
@@ -78,7 +82,9 @@ export class TaskAssignmentService {
   async getAllTasksForUser(userId: string): Promise<ITaskAssignment[]> {
     // const today = new Date();
     // const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-    // const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+    // const endOfDay = new Date(today.setHours(23, 59, 59, 999)); 
+
+    await connectToDatabase (); 
 
     const taskAssignments = await this.taskAssignmentModel
       .find({
@@ -98,6 +104,9 @@ export class TaskAssignmentService {
   }
 
   async assignTaskToUser(userId: string, taskId: string): Promise<ITaskAssignment> {
+
+    await connectToDatabase (); 
+
     const user: any = await this.userModel.findById(userId).populate('package');
     if (!user || !user.package) {
       throw new Error('Utilisateur ou package introuvable');
@@ -154,7 +163,9 @@ export class TaskAssignmentService {
   async deleteTaskAssignment(userId: string, taskId: string): Promise<ITaskAssignment | null> {
     const today = new Date();
     const startOfDay = new Date(today.setHours(0, 0, 0, 0));
-    const endOfDay = new Date(today.setHours(23, 59, 59, 999));
+    const endOfDay = new Date(today.setHours(23, 59, 59, 999)); 
+
+    await connectToDatabase (); 
   
     // Find the task assignment
     const taskAssignment = await this.taskAssignmentModel.findOneAndDelete({
@@ -183,6 +194,9 @@ export class TaskAssignmentService {
   }
 
   async updateTaskAssignmentStatusToInProgress(taskAssignmentId: string): Promise<ITaskAssignment> {
+
+    await connectToDatabase (); 
+
     const taskAssignment = await this.taskAssignmentModel.findById(taskAssignmentId);
     if (!taskAssignment) {
       throw new Error('Affectation de tâche introuvable');
@@ -208,6 +222,8 @@ export class TaskAssignmentService {
     picture: { name: string; public_id: string; url: string }
   ): Promise<ITaskAssignment> {
     // const taskAssignment = await this.taskAssignmentModel.findById(taskAssignmentId); 
+
+    await connectToDatabase (); 
 
     const taskAssignment = await this.taskAssignmentModel
     .findById(taskAssignmentId)
@@ -245,8 +261,6 @@ export class TaskAssignmentService {
     }
 
     const rewardAmount = task.packageId.priceEarnedPerTaskDone;
-
-    console.log(rewardAmount, "there is a reward==============?")
 
     // Update the picture and mark the status as 'completed'
     taskAssignment.picture = picture;

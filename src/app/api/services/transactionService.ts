@@ -1,3 +1,5 @@
+import { connectToDatabase } from '@/app/lib/mongodb';
+
 import { Wallet } from '../models';
 import Transactions
   from '../models/Transactions'; // Adjust the path to the Transactions model
@@ -8,6 +10,7 @@ export class TransactionService {
      * @param userId - The ID of the logged-in user
      */
     async getEarningTransactions(userId: string) {
+        await connectToDatabase (); 
         return Transactions.find({ user: userId, type: 'earning' }).populate({
             path: "user", 
             model: "User"
@@ -22,6 +25,7 @@ export class TransactionService {
      * @param userId - The ID of the logged-in user
      */
     async getFundingTransactions(userId: string) {
+        await connectToDatabase (); 
         return Transactions.find({ user: userId, type: 'funding' }).populate({
             path: "user", 
             model: "User"
@@ -36,6 +40,7 @@ export class TransactionService {
      * @param userId - The ID of the logged-in user
      */
     async getWithdrawalTransactions(userId: string) {
+        await connectToDatabase (); 
         return Transactions.find({ user: userId, type: 'withdrawal' }).populate({
             path: "user", 
             model: "User"
@@ -52,6 +57,7 @@ export class TransactionService {
      * @param endDate - End date of the range
      */
     async getTransactionsByDateRange(userId: string, startDate: string, endDate: string) {
+        await connectToDatabase (); 
         return Transactions.find({
             user: userId,
             createdAt: { $gte: new Date(startDate), $lte: new Date(endDate) },
@@ -72,6 +78,7 @@ export class TransactionService {
      * @param amount - Amount being funded
      */
     async createFundingTransaction({ userId, walletId, transactionId, amount }: { userId: string, walletId: string, transactionId: string, amount: number, }) {
+        await connectToDatabase (); 
         // Ensure wallet exists
         const wallet = await Wallet.findById(walletId);
         if (!wallet) {

@@ -1,5 +1,7 @@
 import schedule from 'node-schedule';
 
+import { connectToDatabase } from '@/app/lib/mongodb';
+
 import { TaskAssignment } from '../models';
 
 class TaskSchedulerService {
@@ -9,6 +11,7 @@ class TaskSchedulerService {
         const tenHoursLater = new Date(Date.now() + 10 * 60 * 60 * 1000);
 
         schedule.scheduleJob(taskAssignmentId, tenHoursLater, async () => {
+            await connectToDatabase (); 
             const taskAssignment = await TaskAssignment.findById(taskAssignmentId);
             if (taskAssignment && taskAssignment.status === 'active') {
                 taskAssignment.status = 'expired';

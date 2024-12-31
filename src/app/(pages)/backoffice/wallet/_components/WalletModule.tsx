@@ -4,21 +4,33 @@ import React from 'react';
 
 import Link from 'next/link';
 
+import { formatToCurrency } from '@/app/lib/formatNumberToCurrency';
 import {
   BlockedEyeSvgIcon,
   ChevronRightSvgIcon,
   EyeSvgIcon,
   GainsDuJourSvgIcon,
+  SpinnerSvgIcon,
   TotalActifSvgIcon,
 } from '@/components/svgs/SvgIcons';
+import useFetchAllAccountEarnings from '@/hooks/useFetchAllAccountEarnings';
+import useFetchAllAccountFunding from '@/hooks/useFetchAllAccountFunding';
+import useFetchAllAccountWithdrawal from '@/hooks/useFetchAllAccountWithdrawal';
 import useFetchAllTasksAssigment from '@/hooks/useFetchAllTasksAssigment';
+import useFetchBalance from '@/hooks/useFetchBalance';
+import { useUserInfo } from '@/hooks/useUserInfo';
 import { useTaskStore } from '@/store/task-store';
 
 const WalletModule = () => {
+  const { user } = useUserInfo (); 
     const [ display, setDisplay ] = React.useState<boolean> (false); 
     const [ displayText, setDisplayText ] = React.useState<string> ("Afficher"); 
     const { allTaskAssignment, isValidating, refetchAllTaskAssignments } = useFetchAllTasksAssigment (); 
-    const { totalEarningsToday, totalEarnings, completedTasks, todayCompletedTasks,  } = useTaskStore(); 
+    const { walletBalanceData } = useFetchBalance (); 
+    const { totalRechargeData, isValidating: isValidatingRechargeData } = useFetchAllAccountFunding (); 
+    const { totalWithdrawalData, isValidating: isValidatingWithdrawal } = useFetchAllAccountWithdrawal (); 
+    const { totalEarningsInStoreData, isValidating: isValidatingEarningData } = useFetchAllAccountEarnings (); 
+    const { totalEarningsToday, totalEarnings, totalEarningsInStore, completedTasks, todayCompletedTasks, totalRechargeInStore, walletBalance, totalWithdrawalInStore } = useTaskStore(); 
 
     console.log(allTaskAssignment, "rrrrrrrrrrrrrrr")
 
@@ -40,11 +52,13 @@ const WalletModule = () => {
       <div className="bg-gradient-to-r w-full from-blue-500 to-blue-700 p-6 rounded-lg shadow-lg text-white max-w-sm mx-auto">
         <div className="mb-4">
           <h1 className="text-lg font-semibold">Portefeuille Recharge</h1>
-          <p className="text-2xl font-bold">0.00 FCFA</p>
+          <p className="text-2xl font-bold">{ isValidatingRechargeData ? "Chargement en cours..." : formatToCurrency(totalRechargeInStore!, 'XAF') || 0 }</p>
         </div>
         <div>
           <h1 className="text-lg font-semibold">Portefeuille Revenus</h1>
-          <p className="text-2xl font-bold">{ totalEarnings } FCFA</p>
+          <p className="text-2xl font-bold">{ isValidating ? (
+            <SpinnerSvgIcon />
+          ) : formatToCurrency(totalEarnings!, 'XAF') || 0 }</p>
         </div>
       </div>
 
@@ -58,7 +72,7 @@ const WalletModule = () => {
       </div>
       <div className='border-t-3 rounded-2xl py-4 flex flex-col gap-3 my-2'>
         <div className='flex flex-row justify-between'>
-          <h1 className='text-black dark:text-white'>ID: 695500474</h1>
+          <h1 className='text-black dark:text-white'>ID: { user?.userInfo?.phone }</h1>
           <div 
           className='flex flex-col cursor-pointer'
           onClick={ () => {
@@ -81,7 +95,7 @@ const WalletModule = () => {
               <h1 className='text-black'>
                 {
                   display ? 
-                    `${ totalEarnings } FCFA`
+                    `${ isValidatingRechargeData ? (<SpinnerSvgIcon />) : totalEarnings } FCFA`
                     :
                     "*******"
                 }
@@ -93,7 +107,7 @@ const WalletModule = () => {
               <h1 className='text-black'>
                 {
                   display ? 
-                    `${ totalEarningsToday } FCFA`
+                    `${ isValidatingRechargeData ? (<SpinnerSvgIcon />) : totalEarningsToday } FCFA`
                     :
                     "*******"
                 }
@@ -131,7 +145,7 @@ const WalletModule = () => {
           <h1>Totals des retraits</h1>
           <div className='flex flex-row items-center'>
             <span className=''>
-              0
+              { isValidatingWithdrawal ? (<SpinnerSvgIcon />) : totalWithdrawalInStore || 0 }
             </span>
             <ChevronRightSvgIcon />
           </div>
@@ -140,7 +154,7 @@ const WalletModule = () => {
           <h1>Total des recharges</h1>
           <div className='flex flex-row items-center'>
             <span className=''>
-              0
+              { isValidatingRechargeData ? (<SpinnerSvgIcon />) : totalRechargeInStore || 0 }
             </span>
             <ChevronRightSvgIcon />
           </div>

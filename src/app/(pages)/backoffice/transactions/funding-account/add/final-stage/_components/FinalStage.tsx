@@ -19,7 +19,7 @@ const FinalStageModule = () => {
   const { user } = useUserInfo ()
   const router = useRouter () 
   const [amount, setAmount] = React.useState("");
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false); 
   const [mobileNumber, setMobileNumber] = React.useState("");
   const [operator, setOperator] = React.useState<AllAccountsType>({});
   const [transactionId, setTransactionId] = React.useState<string>(""); 
@@ -73,6 +73,7 @@ const FinalStageModule = () => {
       setIsLoading (false); 
       return null
     }
+
     try {
       const response = await fetch('/api/transactions/funding', {
           method: 'POST',

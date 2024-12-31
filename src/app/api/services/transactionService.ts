@@ -78,6 +78,12 @@ export class TransactionService {
             throw new Error('Portefeuille introuvable');
         }
 
+        // Check if transaction ID already exists
+        const existingTransaction = await Transactions.findOne({ transactionId });
+        if (existingTransaction) {
+            throw new Error('Vous ne pouvez pas utiliser le même identifiant de transaction deux fois'); // Duplicate transaction ID
+        }
+
         // Create transaction
         const transaction = new Transactions({
             user: userId,

@@ -1,9 +1,12 @@
+import { connectToDatabase } from '@/app/lib/mongodb';
+
 import { User } from '../models';
 import Package from '../models/Package';
 import Task from '../models/Task';
 
 export const getTasksForUser = async (userId: string) => {
     console.log(userId, "llllllllkkkkkkkkkk"); 
+    await connectToDatabase (); 
     // Fetch the user and their subscribed package
     const user = await User
         .findById(userId)
@@ -36,11 +39,14 @@ export const getTasksForUser = async (userId: string) => {
 }
 
 export const getAllTasks = async () => {
+    await connectToDatabase (); 
   return await Task.find().exec(); // Fetch all tasks
 }
 
 export const createTask = async (taskData: any) => {
     const { packageId, ...taskDetails } = taskData;
+
+    await connectToDatabase (); 
 
     // Validate packageId
     const pkg = await Package.findById(packageId);
@@ -60,6 +66,7 @@ export const createTask = async (taskData: any) => {
 }
 
 export const assignTask = async (taskId: string, userId: string) => {
+    await connectToDatabase (); 
     const task = await Task.findById(taskId);
     const user = await Task.findById(userId);
 
@@ -74,6 +81,7 @@ export const assignTask = async (taskId: string, userId: string) => {
 }
 
 export const completeTask = async (taskId: string, userId: string) => {
+    await connectToDatabase (); 
     const task = await Task.findById(taskId);
     const user = await User.findById(userId);
 
@@ -88,6 +96,7 @@ export const completeTask = async (taskId: string, userId: string) => {
 }
 
 export const attachImageToTask = async (taskId: string, imageUrl: string) => {
+    await connectToDatabase (); 
     const task = await Task.findById(taskId);
     if (!task) throw new Error('Task not found');
 

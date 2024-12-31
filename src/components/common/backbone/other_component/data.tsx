@@ -47,7 +47,7 @@ export const bottomNavElement: BottomElemenetType [] = [
         icon: (
             <SettingSvgIcon />
         ), 
-        tooltip: "Mon compte", 
+        tooltip: "Investir", 
         route: "/backoffice/my-account"
     }
 ]

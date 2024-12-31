@@ -6,6 +6,7 @@ import { connectToDatabase } from '@/app/lib/mongodb';
 import { INITIAL_SELECTED_TASKCOUNT } from '../constants';
 import {
   Packages,
+  Transactions,
   Wallet,
 } from '../models';
 import User, { IUser } from '../models/User';
@@ -153,5 +154,56 @@ export const usersService = {
   async deleteUser(userId: string): Promise<void> {
     await connectToDatabase();
     await User.findByIdAndDelete(userId);
-  }
+  }, 
+
+  async upgradePackage(userId: string, packageId: string): Promise<IUser | any> {
+    await connectToDatabase();
+
+    const user = await User.findById(userId) // .populate('userWallet').populate('package');
+    if (!user) throw new Error('Utilisateur introuvable');
+
+    const wallet = await Wallet.findById(user.userWallet);
+    if (!wallet) throw new Error('Portefeuille utilisateur introuvable');
+
+    const newPackage = await Packages.findById(packageId);
+    if (!newPackage) throw new Error('Package introuvable');
+
+    // Check if the new package is a higher level
+    const currentPackage = user.package;
+    if (currentPackage && currentPackage.level >= newPackage.level) {
+      throw new Error('Impossible de rétrograder ou de rester sur le même package');
+    }
+
+    // Check if the wallet has sufficient funds
+    if (wallet.balance < newPackage?.inverstment) {
+      throw new Error('Solde du portefeuille insuffisant pour la mise à niveau du package');
+    }
+
+
+
+    // Deduct the inverstment amount from the wallet
+    wallet.balance -= newPackage.inverstment;
+    await wallet.save();
+
+    console.log(wallet, "Deducted")
+
+    // Update user's package
+    user.package = newPackage._id?.toString();
+    await user.save();
+
+    console.log(user, "Update user's package")
+
+    // Create a transaction record
+    const transaction = new Transactions({
+      user: user._id?.toString(),
+      walletId: wallet._id?.toString(),
+      transactionId: `INVEST_${Date.now()}`, // Example transaction ID format
+      type: 'investing',
+      amount: newPackage.inverstment,
+      status: 'completed',
+    });
+    await transaction.save();
+
+    return user;
+  },
 };

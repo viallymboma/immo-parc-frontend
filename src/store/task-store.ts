@@ -24,13 +24,23 @@ interface TaskState {
   completedTasks?: TaskDataType[], 
   todayCompletedTasks?: TaskDataType[], 
   packageAmounts?: any, 
+  walletBalance?: number;
   selectedPackageAmounts?: any, 
+  totalRechargeInStore?: number, 
+  totalWithdrawalInStore?: number, 
+  totalEarningsInStore?: number, 
+  packagesInStore: any [], 
   setTasks: (tasks_: TaskDataType[]) => void; // Load all tasks
   toggleTaskSelection: (id: number | string, numberOfTaskPerDay: number) => void; // Add or remove a task from the selection
   toggleTaskSelectionV2: (id: number | string, numberOfTaskPerDay: number, userId: string) => void; // Add or remove a task from the selection
   setSelectedTaskFromBack: (filteredTasks: TaskDataType) => void;
   setPackageAmountsFromBack: (packageAmounts: any []) => void; 
   setSelectedPackageAmount?: (selectedPackageAmounts: number) => void; 
+  setWalletBalance: (walletBalance: number) => void; 
+  setTotalRechargeInStore: (totalRechargeInStore: number) => void; 
+  setTotalWithdrawalInStore: (totalWithdrawalInStore: number) => void; 
+  setTotalEarningsInStore: (totalEarningsInStore: number) => void; 
+  setPackagesInStore: (packagesInStore: any []) => void; 
   setAllSelectedTaskFromBack: ({ 
     allSelecTasksForUsers, 
     completedTasks, 
@@ -64,6 +74,51 @@ export const useTaskStore = create<TaskState>((set, get) => {
     totalEarningsToday: get()?.totalEarningsToday || 0, 
     packageAmounts: get()?.packageAmounts || 0, 
     selectedPackageAmounts: get()?.selectedPackageAmounts || 0,
+    walletBalance: get()?.walletBalance || 0,
+    totalRechargeInStore: get()?.totalRechargeInStore || 0,
+    totalWithdrawalInStore: get()?.totalWithdrawalInStore || 0,
+    packagesInStore: get()?.packagesInStore || [], 
+    totalEarningsInStore: get()?.totalEarningsInStore || 0, 
+
+    setTotalEarningsInStore: (totalEarningsInStore: number) =>
+      set((state) => {
+        return {
+          ...state,
+          totalEarningsInStore, 
+        };
+      }),
+
+    setPackagesInStore: (packagesInStore: any []) =>
+      set((state) => {
+        return {
+          ...state,
+          packagesInStore, 
+        };
+      }),
+
+    setTotalRechargeInStore: (totalRechargeInStore: number) =>
+      set((state) => {
+        return {
+          ...state,
+          totalRechargeInStore, 
+        };
+      }),
+
+    setTotalWithdrawalInStore: (totalWithdrawalInStore: number) =>
+      set((state) => {
+        return {
+          ...state,
+          totalWithdrawalInStore, 
+        };
+      }),
+
+    setWalletBalance: (walletBalance: number) =>
+      set((state) => {
+        return {
+          ...state,
+          walletBalance, 
+        };
+      }),
 
     setPackageAmountsFromBack: (packageAmounts: any []) =>
       set((state) => {

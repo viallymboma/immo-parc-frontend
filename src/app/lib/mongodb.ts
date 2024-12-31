@@ -31,3 +31,20 @@ export async function connectToDatabase() {
     throw error;
   }
 }
+
+
+export async function disconnectFromDatabase() {
+  if (!isConnected) {
+    console.log('No active MongoDB connection to disconnect');
+    return;
+  }
+
+  try {
+    await mongoose.disconnect();
+    isConnected = false;
+    console.log('Disconnected from MongoDB');
+  } catch (error) {
+    console.error('Error disconnecting from MongoDB:', error);
+    throw error;
+  }
+}

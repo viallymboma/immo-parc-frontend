@@ -11,7 +11,7 @@ export interface ITransactions extends Document {
   user: Types.ObjectId; // Reference to User
   walletId: Types.ObjectId; 
   transactionId: string; 
-  type: 'funding' | 'withdrawal' | 'earning'; // Type of transaction
+  type: 'funding' | 'withdrawal' | 'earning' | 'investing'; // Type of transaction
   amount: number; // Transaction amount
   status: 'pending' | 'completed' | 'rejected'; // Status of the transaction
 }
@@ -24,7 +24,7 @@ const TransactionsSchema = new Schema<ITransactions>(
         transactionId: { type: String, required: false }, // Mobile Money transaction ID
         type: {
             type: String,
-            enum: ['funding', 'withdrawal', 'earning'],
+            enum: ['funding', 'withdrawal', 'earning', 'investing'],
             required: true,
         },
         amount: { type: Number, required: true },

@@ -12,7 +12,14 @@ export async function GET(req: Request) {
 
     try {
         const transactions = await transactionService.getFundingTransactions(userId);
-        return NextResponse.json(transactions);
+        // Calculate cumulative amount
+        const totalAmount = transactions.reduce((sum, transaction) => sum + transaction.amount, 0);
+
+        // Return response with transactions and total amount
+        return NextResponse.json({
+            transactions,
+            totalAmount,
+        });
     } catch (error: any) {
         return NextResponse.json({ error: error.message }, { status: 500 });
     }

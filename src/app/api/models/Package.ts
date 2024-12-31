@@ -9,7 +9,7 @@ import {
 export interface IPackage extends Document {
     name: string;
     level: number;
-    investment: number;
+    inverstment: number;
     numberOfTaskPerDay: number;
     priceEarnedPerTaskDone: number;
     priceEarnedForAllTaskDonePerDay: number;
@@ -25,7 +25,7 @@ const PackageSchema = new Schema<IPackage>(
     {
         name: { type: String, required: true },
         level: { type: Number, required: true, unique: true, default: 0 },
-        investment: { type: Number, required: true },
+        inverstment: { type: Number, required: true },
         numberOfTaskPerDay: { type: Number, required: true },
         priceEarnedPerTaskDone: { type: Number, required: true },
         priceEarnedForAllTaskDonePerDay: { type: Number, required: true },

@@ -2,18 +2,15 @@
 
 import React from 'react';
 
-import Link from 'next/link';
-
-import {
-  AccountType,
-  my_accounts,
-} from '@/components/data/Productsdata';
+// import Link from 'next/link';
+import { AccountType } from '@/components/data/Productsdata';
+//   my_accounts,
 import ReturnHeader from '@/components/Sidebar/ReturnHeader';
-import {
-  AddSvgIcon,
-  CloseSvgIcon,
-  EditAccountSvgIcon,
-} from '@/components/svgs/SvgIcons';
+
+// import { AddSvgIcon } from '@/components/svgs/SvgIcons';
+//   CloseSvgIcon,
+//   EditAccountSvgIcon,
+import PackageUpgradeModule from './_component/PackageUpgradeModule';
 
 const MyFinancialAccountPage = () => {
     const deleteAccount = (id: string | number, element: AccountType) => {
@@ -33,7 +30,8 @@ const MyFinancialAccountPage = () => {
                 returnBtnLabel='Retour'
                 returnLink='/backoffice/my-account'
             />
-            <div className='flex flex-col gap-3 '>
+            <PackageUpgradeModule />
+            {/* <div className='flex flex-col gap-3 '>
                 {
                     my_accounts?.map((element: AccountType, index: number) => {
                         return (
@@ -60,19 +58,8 @@ const MyFinancialAccountPage = () => {
                         )
                     })
                 }
-            </div>
-            <div className="mb-4.5">
-                <Link
-                    href={"/dashboard/financial-accounts/add"}
-                    type="submit"
-                    className="flex flex-row justify-center gap-3 w-full cursor-pointer items-center rounded-lg bg-primary p-4 font-medium text-white transition hover:bg-opacity-90"
-                >
-                    <AddSvgIcon color='#fff' />
-                    <span>
-                        Ajouter un compte
-                    </span>
-                </Link>
-            </div>
+            </div> */}
+            
         </div>
     )
 }

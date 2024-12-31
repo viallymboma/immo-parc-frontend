@@ -130,10 +130,10 @@ const FundingForm = () => {
 
       <p className='text-red-400'>
         {
-            selectedAccountError && 
-            selectedAccountError !== "" && 
-            selectedAccountError !== undefined && 
-            selectedAccountError
+          selectedAccountError && 
+          selectedAccountError !== "" && 
+          selectedAccountError !== undefined && 
+          selectedAccountError
         }
       </p>
 

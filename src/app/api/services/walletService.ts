@@ -9,7 +9,10 @@ import {
 // import Wallet from '../models/Wallet';
 
 export const getWalletByUserId = async (userId: string) => {
-  return await Wallet.findOne({ user: userId });
+  return await Wallet.findOne({ user: userId }).populate({
+    path: "user", 
+    model: "User"
+  });
 };
 
 export const createOrUpdateWallet = async (userId: string, amount: number) => {
@@ -17,7 +20,10 @@ export const createOrUpdateWallet = async (userId: string, amount: number) => {
     { user: userId },
     { $inc: { balance: amount } },
     { new: true, upsert: true }
-  );
+  ).populate({
+    path: "user", 
+    model: "User"
+  });
   return wallet;
 };
 

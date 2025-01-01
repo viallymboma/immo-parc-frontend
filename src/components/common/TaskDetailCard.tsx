@@ -15,6 +15,7 @@ import useFetchTaskAssigments from '@/hooks/useFetchTaskAssigment';
 import useFetchTasks from '@/hooks/useFetchTasks';
 import { BASE_API_URL } from '@/lib/constants';
 
+import LoadingSpinner from '../Loaders/LoadingSpinner';
 import { Button } from '../ui/button';
 import {
   Card,
@@ -307,7 +308,7 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                                     : "bg-yellow-500 hover:bg-yellow-600"
                                 } text-white px-6 py-2 rounded`}
                                 >
-                                {task?.status === "pending" ? "Cliquez le lien" : uploading ? "En cour..." : task?.status === "in-progress" && !selectedImage ? "Selectionner image" : "Soumettre"}
+                                {task?.status === "pending" ? "Cliquez le lien" : uploading ? (<LoadingSpinner />) : task?.status === "in-progress" && !selectedImage ? "Selectionner image" : "Soumettre"}
                             </Button>
                     }
                 </div>

@@ -31,25 +31,31 @@ export async function POST(req: Request) {
 
         console.log("HAS PASSED THE CHECK"); 
 
-        // Convert the file into a temporary path
-        const arrayBuffer = await image.arrayBuffer();
-        const buffer = Buffer.from(arrayBuffer);
-        const tempFilePath = `/tmp/${image.name}`;
-        await require('fs/promises').writeFile(tempFilePath, buffer);
-        console.log(arrayBuffer, buffer, tempFilePath, "just checking===========>")
+        // // Convert the file into a temporary path
+        // const arrayBuffer = await image.arrayBuffer();
+        // const buffer = Buffer.from(arrayBuffer);
+        // const tempFilePath = `/tmp/${image.name}`;
+        // await require('fs/promises').writeFile(tempFilePath, buffer);
+        // console.log(arrayBuffer, buffer, tempFilePath, "just checking===========>")
 
         // Upload the file to Cloudinary
-        const uploadResult = await cloudinary.uploader.upload(tempFilePath, {
-            folder: 'task_images', 
-            // timeout: 60000, // 60 seconds
-        });
+        // const uploadResult = await cloudinary.uploader.upload(tempFilePath, {
+        //     folder: 'task_images', 
+        //     // timeout: 60000, // 60 seconds
+        // });
 
-        console.log(uploadResult, "THE uploadResult")
+        // console.log(uploadResult, "THE uploadResult")
+
+        // const picture = {
+        //     name: uploadResult.original_filename,
+        //     public_id: uploadResult.public_id,
+        //     url: uploadResult.secure_url,
+        // };
 
         const picture = {
-            name: uploadResult.original_filename,
-            public_id: uploadResult.public_id,
-            url: uploadResult.secure_url,
+            name: "test",
+            public_id: "vd2tug892hn2ofu2dj",
+            url: "uploadResult.secure_url",
         };
 
         // Update task assignment in the database
@@ -58,7 +64,7 @@ export async function POST(req: Request) {
             picture
         );
 
-        await require('fs/promises').unlink(tempFilePath);
+        // await require('fs/promises').unlink(tempFilePath);
 
         // Respond with success
         return NextResponse.json({
@@ -74,6 +80,64 @@ export async function POST(req: Request) {
 
 
 
+
+// export async function POST(req: Request) {
+//     try {
+//         // Parse form data from the request
+//         const formData = await req.formData();
+//         const image = formData.get('image') as File | null;
+//         const taskAssignmentId = formData.get('taskAssignmentId') as string | null;
+
+//         console.log("AT THE ARRIVAL WE HAVE: ", image, taskAssignmentId); 
+
+//         if (!image || !taskAssignmentId) {
+//             return NextResponse.json(
+//                 { message: 'File and task assignment ID are required' },
+//                 { status: 400 }
+//             );
+//         }
+
+//         console.log("HAS PASSED THE CHECK"); 
+
+//         // Convert the file into a temporary path
+//         const arrayBuffer = await image.arrayBuffer();
+//         const buffer = Buffer.from(arrayBuffer);
+//         const tempFilePath = `/tmp/${image.name}`;
+//         await require('fs/promises').writeFile(tempFilePath, buffer);
+//         console.log(arrayBuffer, buffer, tempFilePath, "just checking===========>")
+
+//         // Upload the file to Cloudinary
+//         const uploadResult = await cloudinary.uploader.upload(tempFilePath, {
+//             folder: 'task_images', 
+//             // timeout: 60000, // 60 seconds
+//         });
+
+//         console.log(uploadResult, "THE uploadResult")
+
+//         const picture = {
+//             name: uploadResult.original_filename,
+//             public_id: uploadResult.public_id,
+//             url: uploadResult.secure_url,
+//         };
+
+//         // Update task assignment in the database
+//         const updatedTaskAssignment = await taskAssignmentService.updateTaskAssignmentWithPicture(
+//             taskAssignmentId,
+//             picture
+//         );
+
+//         await require('fs/promises').unlink(tempFilePath);
+
+//         // Respond with success
+//         return NextResponse.json({
+//             message: 'Tâche terminée avec succès',
+//             data: updatedTaskAssignment,
+//         });
+//     } catch (error: any) {
+//         console.log(error, "THE ERROR")
+//         return NextResponse.json({ message: error }, { status: 500 });
+//     }
+// }
 
 
 

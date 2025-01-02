@@ -1,7 +1,6 @@
 "use client";
 import React from 'react';
 
-import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
 import {
@@ -10,7 +9,6 @@ import {
 import LoadingSpinner from '@/components/Loaders/LoadingSpinner';
 import {
   ChevronDownIcon,
-  PlusIcon,
   SearchIcon,
   VerticalDotsIcon,
 } from '@/components/svgs/SvgIcons';
@@ -55,12 +53,12 @@ const INITIAL_VISIBLE_COLUMNS = [
 // type Recharge = typeof recharges[0];
 
 type TableRechargeType = {
-  allFundingTransactionsData: TransactionType []; 
+  allEarningTransactionsData: TransactionType []; 
   isValidatingRechargeData?: boolean;
 }
 
-const RechargesTable: React.FC <TableRechargeType> = ({ allFundingTransactionsData, isValidatingRechargeData }) => {
-  const allFundingTransactionsInStore = allFundingTransactionsData?.map((fund: TransactionType) => {
+const EarningsTable: React.FC <TableRechargeType> = ({ allEarningTransactionsData, isValidatingRechargeData }) => {
+  const allEarningTransactionsInStore = allEarningTransactionsData?.map((fund: TransactionType) => {
     return {
       ...fund, 
       phone_number: fund?.user?.phone, 
@@ -81,7 +79,7 @@ const RechargesTable: React.FC <TableRechargeType> = ({ allFundingTransactionsDa
 
   const router = useRouter ()
 
-  const pages = Math.ceil(allFundingTransactionsInStore?.length / rowsPerPage);
+  const pages = Math.ceil(allEarningTransactionsInStore?.length / rowsPerPage);
 
   const hasSearchFilter = Boolean(filterValue);
 
@@ -92,7 +90,7 @@ const RechargesTable: React.FC <TableRechargeType> = ({ allFundingTransactionsDa
   }, [visibleColumns]);
 
   const filteredItems = React.useMemo(() => {
-    let filteredRecharges = [...allFundingTransactionsInStore];
+    let filteredRecharges = [...allEarningTransactionsInStore];
 
     if (hasSearchFilter) {
       filteredRecharges = filteredRecharges.filter((recharge) =>{
@@ -108,7 +106,7 @@ const RechargesTable: React.FC <TableRechargeType> = ({ allFundingTransactionsDa
     }
 
     return filteredRecharges;
-  }, [allFundingTransactionsInStore, filterValue, statusFilter]);
+  }, [allEarningTransactionsInStore, filterValue, statusFilter]);
 
   const items = React.useMemo(() => {
     const start = (page - 1) * rowsPerPage;
@@ -298,27 +296,17 @@ const RechargesTable: React.FC <TableRechargeType> = ({ allFundingTransactionsDa
                 ))}
               </DropdownMenu>
             </Dropdown>
-            <Link
+            {/* <Link
               href={"/backoffice/transactions/funding-account/add"}
               className="bg-foreground flex flex-row text-background p-2 rounded-xl"
             >
               <PlusIcon />
               Recharger
-            </Link>
-            {/* <Button
-              onClick={() => {
-                router.push("/backoffice/transactions/funding-account/add")
-              }}
-              className="bg-foreground text-background"
-              endContent={<PlusIcon />}
-              size="sm"
-            >
-              Recharger
-            </Button> */}
+            </Link> */}
           </div>
         </div>
         <div className="flex justify-between items-center">
-          <span className="text-default-400 text-small">Total {allFundingTransactionsInStore?.length} recharges</span>
+          <span className="text-default-400 text-small">Total {allEarningTransactionsInStore?.length} recharges</span>
           <label className="flex items-center text-default-400 text-small">
             Rows per page:
             <select
@@ -339,7 +327,7 @@ const RechargesTable: React.FC <TableRechargeType> = ({ allFundingTransactionsDa
     visibleColumns,
     onSearchChange,
     onRowsPerPageChange,
-    allFundingTransactionsInStore?.length,
+    allEarningTransactionsInStore?.length,
     hasSearchFilter,
   ]);
 
@@ -419,7 +407,7 @@ const RechargesTable: React.FC <TableRechargeType> = ({ allFundingTransactionsDa
             </TableColumn>
           )}
         </TableHeader>
-        <TableBody emptyContent={"No recharges found"} loadingContent={ isValidatingRechargeData ? <LoadingSpinner /> : null } items={sortedItems}>
+        <TableBody emptyContent={"No earnings found"} loadingContent={ isValidatingRechargeData ? <LoadingSpinner /> : null } items={sortedItems}>
           {(item: TransactionType) => (
             <TableRow key={item._id}>
               {(columnKey: React.Key) => <TableCell>{renderCell(item, columnKey)}</TableCell>}
@@ -431,4 +419,4 @@ const RechargesTable: React.FC <TableRechargeType> = ({ allFundingTransactionsDa
   );
 }
 
-export default RechargesTable; 
+export default EarningsTable; 

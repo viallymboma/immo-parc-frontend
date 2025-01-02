@@ -5,6 +5,7 @@ import { create } from 'zustand';
 import {
   TaskDataType,
   tasks,
+  TransactionType,
 } from '@/components/common/backbone/other_component/data';
 // import { useUserInfo } from '@/hooks/useUserInfo';
 import { BASE_API_URL } from '@/lib/constants';
@@ -29,7 +30,16 @@ interface TaskState {
   totalRechargeInStore?: number, 
   totalWithdrawalInStore?: number, 
   totalEarningsInStore?: number, 
+  totalInvestmentInStore?: number, 
   packagesInStore: any [], 
+  allEarningTransactionsInStore: TransactionType [], 
+  allFundingTransactionsInStore: TransactionType [], 
+  allWithdrawalTransactionsInStore: TransactionType [], 
+  allInvestmentTransactionsInStore: TransactionType [], 
+  setEarningTransactionsInStore: (allEarningTransactionsInStore: any []) => void; 
+  setFundingTransactionsInStore: (allFundingTransactionsInStore: any []) => void; 
+  setWithdrawalTransactionsInStore: (allWithdrawalTransactionsInStore: any []) => void; 
+  setInvestmentTransactionsInStore: (allInvestmentTransactionsInStore: any []) => void; 
   setTasks: (tasks_: TaskDataType[]) => void; // Load all tasks
   toggleTaskSelection: (id: number | string, numberOfTaskPerDay: number) => void; // Add or remove a task from the selection
   toggleTaskSelectionV2: (id: number | string, numberOfTaskPerDay: number, userId: string) => void; // Add or remove a task from the selection
@@ -40,7 +50,9 @@ interface TaskState {
   setTotalRechargeInStore: (totalRechargeInStore: number) => void; 
   setTotalWithdrawalInStore: (totalWithdrawalInStore: number) => void; 
   setTotalEarningsInStore: (totalEarningsInStore: number) => void; 
-  setPackagesInStore: (packagesInStore: any []) => void; 
+  setTotalInvestmentInStore: (totalInvestmentInStore: number) => void; 
+  setPackagesInStore: (packagesInStore: TransactionType []) => void; 
+  
   setAllSelectedTaskFromBack: ({ 
     allSelecTasksForUsers, 
     completedTasks, 
@@ -79,6 +91,52 @@ export const useTaskStore = create<TaskState>((set, get) => {
     totalWithdrawalInStore: get()?.totalWithdrawalInStore || 0,
     packagesInStore: get()?.packagesInStore || [], 
     totalEarningsInStore: get()?.totalEarningsInStore || 0, 
+    totalInvestmentInStore: get()?.totalInvestmentInStore || 0,
+
+    allEarningTransactionsInStore: get()?.allEarningTransactionsInStore || [], 
+    allFundingTransactionsInStore: get()?.allFundingTransactionsInStore || [], 
+    allWithdrawalTransactionsInStore: get()?.allWithdrawalTransactionsInStore || [], 
+    allInvestmentTransactionsInStore: get()?.allInvestmentTransactionsInStore || [], 
+
+    setEarningTransactionsInStore: (allEarningTransactionsInStore: TransactionType []) =>
+      set((state) => {
+        return {
+          ...state,
+          allEarningTransactionsInStore, 
+        };
+      }),
+    
+    setFundingTransactionsInStore: (allFundingTransactionsInStore: TransactionType []) =>
+      set((state) => {
+        return {
+          ...state,
+          allFundingTransactionsInStore, 
+        };
+      }),
+
+    setWithdrawalTransactionsInStore: (allWithdrawalTransactionsInStore: TransactionType []) =>
+      set((state) => {
+        return {
+          ...state,
+          allWithdrawalTransactionsInStore, 
+        };
+      }),
+
+    setInvestmentTransactionsInStore: (allInvestmentTransactionsInStore: TransactionType []) =>
+      set((state) => {
+        return {
+          ...state,
+          allInvestmentTransactionsInStore, 
+        };
+      }),
+
+    setTotalInvestmentInStore: (totalInvestmentInStore: number) =>
+      set((state) => {
+        return {
+          ...state,
+          totalInvestmentInStore, 
+        };
+      }),
 
     setTotalEarningsInStore: (totalEarningsInStore: number) =>
       set((state) => {

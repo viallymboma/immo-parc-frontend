@@ -270,6 +270,55 @@ export const tasks: TaskDataType [] = [
     }, 
 ]
 
+export type UserTypeForTransaction = {
+    _id: string;
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    password: string;
+    parent: string;
+    children: string[];
+    funds: number;
+    selectedTasksCount: number;
+    accountType: string;
+    role: string;
+    status: string;
+    package: string;
+    internshipExpiry: string; // ISO date string
+    createdAt: string; // ISO date string
+    updatedAt: string; // ISO date string
+    __v: number;
+    userWallet: string;
+}
+
+export type WalletTypeForTransaction = {
+    _id: string;
+    user: string;
+    balance: number;
+    createdAt: string; // ISO date string
+    updatedAt: string; // ISO date string
+    __v: number;
+}
+
+
+export type TransactionType = {
+    _id: string;
+    user: UserTypeForTransaction;
+    walletId: WalletTypeForTransaction; 
+    phone_number?: number; 
+    walletBallance?: number; 
+    transactionId?: string; 
+    type: string; // e.g., "earning"
+    amount: number;
+    status: string; // e.g., "completed"
+    createdAt: string; // ISO date string
+    updatedAt: string; // ISO date string
+    __v: number;
+};
+
+
 
 
 

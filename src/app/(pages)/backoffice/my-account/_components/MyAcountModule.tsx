@@ -4,22 +4,30 @@ import React from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 
+import { formatToCurrency } from '@/app/lib/formatNumberToCurrency';
 import {
   BottomElemenetType,
   bottomNavElementInAccount,
 } from '@/components/common/backbone/other_component/data';
+import LoadingSpinner from '@/components/Loaders/LoadingSpinner';
 // import {
 //   BottomElemenetType,
 //   bottomNavElementInAccount,
 // } from '@/components/data/Productsdata';
 import { ChevronRightSvgIcon } from '@/components/svgs/SvgIcons';
+import useFetchBalance from '@/hooks/useFetchBalance';
 import { useUserInfo } from '@/hooks/useUserInfo';
+import { useTaskStore } from '@/store/task-store';
 
 import IconImage from '../../../../../../public/imgs/total des gains.png';
 
 const MyAcountModule = () => {
 
-    const { user } = useUserInfo ()
+    const { user } = useUserInfo (); 
+
+    const { walletBalanceData, isValidating } = useFetchBalance (); 
+
+    const { walletBalance } = useTaskStore(); 
 
     return (
         <div className='flex flex-col gap-3'>
@@ -31,6 +39,7 @@ const MyAcountModule = () => {
                 <div>
                     <h1 className='text-white dark:text-black'>{ user?.userInfo?.phone }</h1>
                     <p>{ user?.userInfo?.package?.name }</p>
+                    <p className='text-[20px] font-bold'>  { isValidating ? <LoadingSpinner /> : formatToCurrency(walletBalance!, 'XAF') } </p>
                 </div>
             </div>
             <div className='flex flex-col gap-3 '>

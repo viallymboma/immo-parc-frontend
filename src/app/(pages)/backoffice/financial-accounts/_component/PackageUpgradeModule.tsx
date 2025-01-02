@@ -57,7 +57,7 @@ const PackageUpgradeModule = () => {
             }
 
             toast.success('Package upgraded successfully!');
-            router.push(`/backoffice/user-profile`);
+            router.push(`/backoffice/my-account`);
         } catch (error: any) {
             toast.error(`Error: ${error.message}`);
         } finally {

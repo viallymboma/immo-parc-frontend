@@ -14,14 +14,15 @@ const fetcher = async (url: string) => {
 };
 
 const useFetchAllAccountFunding = () => {
-    const { setTotalRechargeInStore } = useTaskStore();
+    const { setTotalRechargeInStore, setFundingTransactionsInStore } = useTaskStore();
     const { user } = useUserInfo ()
     const { data, error, isValidating, mutate } = useSWR(`${BASE_API_URL}/transactions/funding?userId=${ user?.userInfo?._id }`, fetcher, {
-        onSuccess: (totalRechargeInStore) => {
+        onSuccess: (totalRecharge) => {
             // TRANSFORM DATA HERE 
-            console.log("here in useFetchAllAccountFunding onSuccess", totalRechargeInStore)
+            console.log("here in useFetchAllAccountFunding onSuccess", totalRecharge)
             // Update Zustand store when data is fetched
-            setTotalRechargeInStore(totalRechargeInStore?.totalAmount);
+            setFundingTransactionsInStore (totalRecharge?.transactions)
+            setTotalRechargeInStore(totalRecharge?.totalAmount);
         },
         refreshInterval: 0, // Disable periodic revalidation
         revalidateOnFocus: false,

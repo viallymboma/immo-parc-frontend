@@ -15,6 +15,7 @@ import {
 } from '@/components/svgs/SvgIcons';
 import useFetchAllAccountEarnings from '@/hooks/useFetchAllAccountEarnings';
 import useFetchAllAccountFunding from '@/hooks/useFetchAllAccountFunding';
+import useFetchAllAccountInvestment from '@/hooks/useFetchAllAccountInvestment';
 import useFetchAllAccountWithdrawal from '@/hooks/useFetchAllAccountWithdrawal';
 import useFetchAllTasksAssigment from '@/hooks/useFetchAllTasksAssigment';
 import useFetchBalance from '@/hooks/useFetchBalance';
@@ -29,8 +30,13 @@ const WalletModule = () => {
     const { walletBalanceData } = useFetchBalance (); 
     const { totalRechargeData, isValidating: isValidatingRechargeData } = useFetchAllAccountFunding (); 
     const { totalWithdrawalData, isValidating: isValidatingWithdrawal } = useFetchAllAccountWithdrawal (); 
-    const { totalEarningsInStoreData, isValidating: isValidatingEarningData } = useFetchAllAccountEarnings (); 
-    const { totalEarningsToday, totalEarnings, totalEarningsInStore, completedTasks, todayCompletedTasks, totalRechargeInStore, walletBalance, totalWithdrawalInStore } = useTaskStore(); 
+    const { totalEarningsData, isValidating: isValidatingEarningData } = useFetchAllAccountEarnings (); 
+    const { totalInvestmentData, isValidating: isValidatingInvestmentData } = useFetchAllAccountInvestment (); 
+    const { totalEarningsToday, totalEarnings, 
+      totalEarningsInStore, completedTasks, 
+      todayCompletedTasks, totalRechargeInStore, 
+      walletBalance, totalWithdrawalInStore, 
+      totalInvestmentInStore } = useTaskStore(); 
 
     console.log(allTaskAssignment, "rrrrrrrrrrrrrrr")
 
@@ -155,6 +161,15 @@ const WalletModule = () => {
           <div className='flex flex-row items-center'>
             <span className=''>
               { isValidatingRechargeData ? (<SpinnerSvgIcon />) : totalRechargeInStore || 0 }
+            </span>
+            <ChevronRightSvgIcon />
+          </div>
+        </Link>
+        <Link href={`/backoffice/transactions/investments/`} className='flex flex-row justify-between py-3 rounded-md border-b-1 border-b-slate-200'>
+          <h1>Total des investissements</h1>
+          <div className='flex flex-row items-center'>
+            <span className=''>
+              { isValidatingInvestmentData ? (<SpinnerSvgIcon />) : totalInvestmentInStore || 0 }
             </span>
             <ChevronRightSvgIcon />
           </div>

@@ -8,7 +8,7 @@ const CommissionsPage = () => {
   return (
     <div>
       <ReturnHeader 
-          headerName='Mes Gains'
+          headerName='Details des gains'
           returnBtnLabel='Retour'
           returnLink='/backoffice/wallet'
       />

@@ -1,10 +1,16 @@
 "use client";
 import React from 'react';
 
+import { formatToCurrency } from '@/app/lib/formatNumberToCurrency';
 import ReturnHeader from '@/components/Sidebar/ReturnHeader';
-import RechargesTable from '@/components/Tables/AllTables/RechargesTable';
+import { SpinnerSvgIcon } from '@/components/svgs/SvgIcons';
+import WithdrawalTable from '@/components/Tables/AllTables/WithdrawalTable';
+import useFetchAllAccountWithdrawal from '@/hooks/useFetchAllAccountWithdrawal';
+import { useTaskStore } from '@/store/task-store';
 
 const WithdrawalModule = () => {
+  const { totalWithdrawalData, isValidating: isValidatingWithdrawalData } = useFetchAllAccountWithdrawal (); 
+  const { totalWithdrawalInStore, allWithdrawalTransactionsInStore } = useTaskStore(); 
   return (
     <div>
         <ReturnHeader 
@@ -14,9 +20,11 @@ const WithdrawalModule = () => {
         />
         <div>
           <div>
-            <h1>Liste des retraits</h1>
+            <div>total: { isValidatingWithdrawalData ? (<SpinnerSvgIcon />) : formatToCurrency(totalWithdrawalInStore!, 'XAF') }</div>
           </div>
-            <RechargesTable />
+          <div className='py-[2rem]'>
+              <WithdrawalTable allWithdrawalTransactionsData={allWithdrawalTransactionsInStore} isValidatingWithdrawalData={ isValidatingWithdrawalData } />
+          </div>
         </div>
     </div>
   )

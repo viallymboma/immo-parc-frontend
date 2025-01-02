@@ -6,6 +6,21 @@ import Transactions
 
 export class TransactionService {
     /**
+     * Get all transactions of type "investing" for a specific user
+     * @param userId - The ID of the logged-in user
+     */
+    async getInvestingTransactions(userId: string) {
+        await connectToDatabase (); 
+        return Transactions.find({ user: userId, type: 'investing' }).populate({
+            path: "user", 
+            model: "User"
+        }).populate({
+            path: "walletId", 
+            model: "Wallet"
+        });
+    }
+
+    /**
      * Get all transactions of type "earning" for a specific user
      * @param userId - The ID of the logged-in user
      */

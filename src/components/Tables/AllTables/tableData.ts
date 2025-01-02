@@ -220,12 +220,14 @@ const columns = [
 
 // RECHARGES =========================================
 const columnsRecharges = [
-  {name: "ID", uid: "id", sortable: true},
-  {name: "Montan", uid: "amount", sortable: true},
-  {name: "Operateur", uid: "operator", sortable: true},
-  {name: "Service", uid: "service", sortable: true},
+  {name: "ID", uid: "_id", sortable: true},
+  {name: "Montan", uid: "amount", sortable: true}, 
+  {name: "Portefeuil", uid: "walletId", sortable: true}, 
+  {name: "Montan Portefeuil", uid: "walletBallance", sortable: true}, 
+  {name: "DATE", uid: "createdAt"},
+  {name: "Category", uid: "type", sortable: true},
+  // {name: "Service", uid: "service", sortable: true},
   {name: "Numero", uid: "phone_number", sortable: true},
-  {name: "DATE", uid: "date_created"},
   {name: "STATUS", uid: "status", sortable: true},
   {name: "ACTIONS", uid: "actions"},
 ];

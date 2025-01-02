@@ -83,7 +83,7 @@ export const usersService = {
     await wallet.save();
 
     // Link wallet to user
-    user.wallet = wallet._id;
+    user.userWallet = wallet._id;
     // await user.save();
 
     // SAVE USER UPDATE
@@ -120,7 +120,21 @@ export const usersService = {
       package: highestPackage._id
     });
 
-    return superAdmin.save();
+    // Create wallet for the user
+    const wallet = new Wallet({
+      balance: 0,
+      user: superAdmin._id,
+    });
+    await wallet.save();
+
+    // Link wallet to user
+    superAdmin.userWallet = wallet._id;
+    // await user.save();
+
+    // SAVE USER UPDATE
+    const result = await superAdmin.save();
+
+    return result;
   },
 
   async updateStatus(userId: string, status: 'internship' | 'regular'): Promise<IUser> {
@@ -157,12 +171,13 @@ export const usersService = {
   }, 
 
   async upgradePackage(userId: string, packageId: string): Promise<IUser | any> {
+
     await connectToDatabase();
 
-    const user = await User.findById(userId) // .populate('userWallet').populate('package');
+    const user = await User.findById(userId).populate(['parent', 'children', 'package', 'userWallet']) // .populate('userWallet').populate('package');
     if (!user) throw new Error('Utilisateur introuvable');
 
-    const wallet = await Wallet.findById(user.userWallet);
+    const wallet = await Wallet.findById(user.userWallet?._id.toString());
     if (!wallet) throw new Error('Portefeuille utilisateur introuvable');
 
     const newPackage = await Packages.findById(packageId);
@@ -170,16 +185,17 @@ export const usersService = {
 
     // Check if the new package is a higher level
     const currentPackage = user.package;
+    console.log(currentPackage, currentPackage.package, newPackage, "////////////////")
     if (currentPackage && currentPackage.level >= newPackage.level) {
-      throw new Error('Impossible de rétrograder ou de rester sur le même package');
+      throw new Error('Impossible de rétrograder ou de reactiver le même package');
     }
+
+    // return
 
     // Check if the wallet has sufficient funds
     if (wallet.balance < newPackage?.inverstment) {
       throw new Error('Solde du portefeuille insuffisant pour la mise à niveau du package');
     }
-
-
 
     // Deduct the inverstment amount from the wallet
     wallet.balance -= newPackage.inverstment;

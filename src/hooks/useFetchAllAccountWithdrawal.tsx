@@ -14,14 +14,15 @@ const fetcher = async (url: string) => {
 };
 
 const useFetchAllAccountWithdrawal = () => {
-    const { setTotalWithdrawalInStore } = useTaskStore();
+    const { setTotalWithdrawalInStore, setWithdrawalTransactionsInStore } = useTaskStore();
     const { user } = useUserInfo ()
     const { data, error, isValidating, mutate } = useSWR(`${BASE_API_URL}/transactions/withdrawal?userId=${ user?.userInfo?._id }`, fetcher, {
-        onSuccess: (totalWithdrawalInStore) => {
+        onSuccess: (totalWithdrawal) => {
             // TRANSFORM DATA HERE 
-            console.log("here in useFetchAllAccountWithdrawal onSuccess", totalWithdrawalInStore)
+            console.log("here in useFetchAllAccountWithdrawal onSuccess", totalWithdrawal)
             // Update Zustand store when data is fetched
-            setTotalWithdrawalInStore(totalWithdrawalInStore?.totalAmount);
+            setWithdrawalTransactionsInStore (totalWithdrawal?.transactions)
+            setTotalWithdrawalInStore(totalWithdrawal?.totalAmount);
         },
         refreshInterval: 0, // Disable periodic revalidation
         revalidateOnFocus: false,

@@ -13,32 +13,32 @@ const fetcher = async (url: string) => {
     return response.data;
 };
 
-const useFetchAllAccountEarnings = () => {
-    const { setTotalEarningsInStore, setEarningTransactionsInStore } = useTaskStore();
+const useFetchAllAccountInvestment = () => {
+    const { setTotalInvestmentInStore, setInvestmentTransactionsInStore } = useTaskStore();
     const { user } = useUserInfo ()
-    const { data, error, isValidating, mutate } = useSWR(`${BASE_API_URL}/transactions/earning?userId=${ user?.userInfo?._id }`, fetcher, {
-        onSuccess: (totalEarnings) => {
+    const { data, error, isValidating, mutate } = useSWR(`${BASE_API_URL}/transactions/investing?userId=${ user?.userInfo?._id }`, fetcher, {
+        onSuccess: (totalInvestment) => {
             // TRANSFORM DATA HERE 
-            console.log("here in useFetchAllAccountEarnings onSuccess", totalEarnings)
+            console.log("here in useFetchAllAccountInvestment onSuccess", totalInvestment)
             // Update Zustand store when data is fetched
-            setEarningTransactionsInStore (totalEarnings?.transactions)
-            setTotalEarningsInStore(totalEarnings?.totalAmount);
+            setInvestmentTransactionsInStore (totalInvestment?.transactions)
+            setTotalInvestmentInStore(totalInvestment?.totalAmount);
         },
         refreshInterval: 0, // Disable periodic revalidation
         revalidateOnFocus: false,
         revalidateOnReconnect: false,
     });
 
-    const refetchTotalEarningsInStore = async () => {
+    const refetchTotalInvestmentInStore = async () => {
         await mutate(); // Revalidates the SWR cache
     };
 
     return {
-        totalEarningsData: data || [],
+        totalInvestmentData: data || [],
         error,
         isValidating,
-        refetchTotalEarningsInStore,
+        refetchTotalInvestmentInStore,
     };
 };
 
-export default useFetchAllAccountEarnings;
+export default useFetchAllAccountInvestment;

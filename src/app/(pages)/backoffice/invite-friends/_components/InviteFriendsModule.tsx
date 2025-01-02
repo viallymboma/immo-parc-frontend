@@ -21,7 +21,10 @@ const InviteFriendsModule = () => {
 
     // Function to save the QR code as an image
     const saveQRCode = () => {
-        if (qrRef.current) {
+        if (user?.userInfo?.package?.level === 0) {
+            toast.error(`Vous êtes toujours en compte stagiaire. vous ne pouvez pas envoyer d'invitation, si vous ne passez pas à un forfait supérieur`); 
+            return null;
+        } else if (qrRef.current) {
             const canvas = qrRef.current.querySelector('canvas');
             if (canvas) {
                 const dataUrl = canvas.toDataURL("image/png");
@@ -34,17 +37,12 @@ const InviteFriendsModule = () => {
     };
 
     // // Function to copy the URL to clipboard
-    // const copyToClipboard = async () => {
-    //     try {
-    //         await navigator.clipboard.writeText(url);
-    //         alert("URL copied to clipboard!");
-    //     } catch (error) {
-    //         console.error("Failed to copy URL:", error);
-    //         alert("Failed to copy URL");
-    //     }
-    // };
     const copyToClipboard = React.useCallback(async () => {
         try {
+            if (user?.userInfo?.package?.level === 0) {
+                toast.error(`Vous êtes toujours en compte stagiaire. vous ne pouvez pas envoyer d'invitation, si vous ne passez pas à un forfait supérieur`); 
+                return null;
+            }
             await navigator.clipboard.writeText(url);
             toast.success(`URL copiée : ${ url }`); 
         } catch (error) {

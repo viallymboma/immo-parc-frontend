@@ -6,11 +6,7 @@ import '@/css/style.css';
 
 import React from 'react';
 
-import axios from 'axios';
-import { cookies } from 'next/headers';
-
 import MainLayout from '@/components/common/backbone/MainLayout';
-import { BASE_API_URL } from '@/lib/constants';
 
 // import { useUserInfo } from '@/hooks/useUserInfo';
 
@@ -21,36 +17,6 @@ const RootLayout = async ({
 }: Readonly<{
   children: React.ReactNode;
 }>) => {
-
-  const cookieStore = cookies();
-  const token = cookieStore.get('jwt')?.value; // Adjust based on your cookie name
-
-  // const { user } = useUserInfo ()
-
-  try {
-    if (!token) throw new Error('No token found');
-    // Optionally, verify token validity with a backend API call
-    const request = await axios.get(`${BASE_API_URL}/auth/verify-token`, {
-      headers: {
-        Authorization: `Bearer ${token}`, // Send token in the Authorization header
-      },
-    });
-    // console.log("yyyyyyyyyyyy", token)
-  } catch (error) {
-    // Redirect to signout page if token is invalid
-    // return (
-    //   <html>
-    //     <head>
-    //       <meta http-equiv="refresh" content="0; url=/auth/signin" />
-    //     </head>
-    //   </html>
-    // );
-    return (
-      <MainLayout>
-        { children }
-      </MainLayout>
-    );
-  }
 
   return (
     <MainLayout>

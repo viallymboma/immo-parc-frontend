@@ -13,12 +13,15 @@ export async function POST(req: Request, res: any) {
     try {
         const user = await usersService.createUser(phone, password, packageId, parentId, email, firstName, lastName);
 
-        // Handle Ce numero existe deja dans le system error
-        if ('error' in user) {
-            return NextResponse.json({ message: user.error }, { status: 400 });
-        }
+        console.log(user, "7r2nfuwifj9pfk-fifunfirj")
+
+        // // Handle Ce numero existe deja dans le system error
+        // if ('error' in user) {
+        //     return NextResponse.json({ message: user.error }, { status: 400 });
+        // }
         return NextResponse.json(user, { status: 201 });
-    } catch (error) {
-        return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+    } catch (error: any) {
+        // return NextResponse.json({ message: 'Internal Server Error' }, { status: 500 });
+        return NextResponse.json({ error: error.message }, { status: 500 });
     }
 }

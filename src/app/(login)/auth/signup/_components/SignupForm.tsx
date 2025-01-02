@@ -98,18 +98,15 @@ const SignupForm = () => {
         console.error("Error Status:", error.response.status); // HTTP status code
         console.error("Error Headers:", error.response.headers); // Response headers
         // Optionally show the error message in the UI
-        toast.error(`Error: ${error.response.data.message || 'Something went wrong!'}`)
-        // alert(`Error: ${error.response.data.message || 'Something went wrong!'}`);
+        toast.error(`Error: ${error.response.data.error || 'Something went wrong!'}`)
       } else if (error.request) {
         // No response was received from the server
         console.error("Erreur Request:", error.request);
         toast.error(`Erreur Request: ${error.request || 'Something went wrong!'}`)
-        // alert("Error: No response from the server.");
       } else {
         // Something went wrong while setting up the request
         console.error("Error Message:", error.message);
         toast.error(`Erreur Message: ${error.request || 'Something went wrong!'}`)
-        // alert(`Error: ${error.message}`);
       }
     }
   }

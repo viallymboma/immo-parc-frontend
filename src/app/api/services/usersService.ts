@@ -53,9 +53,11 @@ export const usersService = {
       if (!pkg) throw new Error('No packages available');
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
+    const parentCheck = await User.findOne({ phone: parentId }).populate(['parent', 'children', 'package', 'userWallet']) // .populate('userWallet').populate('package');
 
-    console.log(hashedPassword, "hased pass")
+    if (parentCheck.package.level === 0) throw new Error("Votre parrain ne peut pas vous inviter s'il n'est pas passé au niveau Agent Echo level 1");
+
+    const hashedPassword = await bcrypt.hash(password, 10);
 
     const user = new User({
       username: `user_${Date.now()}`,
@@ -73,8 +75,6 @@ export const usersService = {
       children: []
     });
 
-    console.log(user, "user thing")
-
     // Create wallet for the user
     const wallet = new Wallet({
       balance: 0,
@@ -84,7 +84,6 @@ export const usersService = {
 
     // Link wallet to user
     user.userWallet = wallet._id;
-    // await user.save();
 
     // SAVE USER UPDATE
     await user.save();
@@ -185,7 +184,7 @@ export const usersService = {
 
     // Check if the new package is a higher level
     const currentPackage = user.package;
-    console.log(currentPackage, currentPackage.package, newPackage, "////////////////")
+    // console.log(currentPackage, currentPackage.package, newPackage, "////////////////")
     if (currentPackage && currentPackage.level >= newPackage.level) {
       throw new Error('Impossible de rétrograder ou de reactiver le même package');
     }

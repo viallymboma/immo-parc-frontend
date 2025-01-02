@@ -39,7 +39,7 @@ const MyAcountModule = () => {
                 <div>
                     <h1 className='text-white dark:text-black'>{ user?.userInfo?.phone }</h1>
                     <p>{ user?.userInfo?.package?.name }</p>
-                    <p className='text-[20px] font-bold'>  { isValidating ? <LoadingSpinner /> : formatToCurrency(walletBalance!, 'XAF') } </p>
+                    <div className='text-[20px] font-bold'>  { isValidating ? <LoadingSpinner /> : formatToCurrency(walletBalance!, 'XAF') } </div>
                 </div>
             </div>
             <div className='flex flex-col gap-3 '>

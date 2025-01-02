@@ -40,6 +40,10 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
 
     const copyToClipboard = React.useCallback(async () => {
         try {
+            if (task?.status === "completed") {
+                toast.error(`Tâche terminée.`); 
+                return
+            }
             await navigator.clipboard.writeText(task?.taskLink);
             toast.success('URL copiée dans le presse-papier!'); 
         } catch (error) {
@@ -226,6 +230,10 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                         <Button 
                             onClick={async () => {
                                 if (task?.taskLink) {
+                                    if (task?.status === "completed") {
+                                        toast.error(`Tâche terminée.`); 
+                                        return
+                                    }
                                     window.open(task.taskLink, '_blank');
 
                                     console.log("BEFORE EXECUTING REQUEST"); 
@@ -244,8 +252,9 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                                     const result = await response.json();
 
                                     if (!response.ok) {
-                                        toast.error("Échec de la mise à jour de l'état de la tâche")
-                                        throw new Error(result.error || 'Failed to update task status');
+                                        toast.error(`Échec de la mise à jour de l'état de la tâche: ${ result?.error }`); 
+                                        return;
+                                        // throw new Error(result.error || 'Failed to update task status');
                                     }
 
                                     console.log("AFTER REQUEST STATUS REQUEST"); 
@@ -260,7 +269,8 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                                     toast.success("Statut de la tâche mis à jour comme étant en cours")
                                 }
                             }}
-                            variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700">
+                            variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700"
+                        >
                             <ExternalLink className="w-4 h-4 mr-1" />
                             Ouvrir le lien
                         </Button>

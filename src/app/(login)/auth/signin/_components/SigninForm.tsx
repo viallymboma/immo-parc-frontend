@@ -52,12 +52,12 @@ export default function SigninForm() {
 
   const onSubmit = async (data: SigninFormValues) => {
     try {
-      console.log(data, "datata")
+      // console.log(data, "datata")
       await login(data.phone, data.password);
       toast.success("Connexion reussit")
       router.push("/backoffice"); // Redirect after successful login
     } catch (err: any) {
-      console.error("Login error:", err.message);
+      // console.error("Login error:", err.message);
       toast.error(err.message)
     }
   };

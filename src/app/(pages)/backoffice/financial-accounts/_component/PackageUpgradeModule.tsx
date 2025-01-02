@@ -19,7 +19,7 @@ const PackageUpgradeModule = () => {
     const { user } = useUserInfo (); 
     const router = useRouter();
     const { packagesInStore } = useTaskStore(); 
-    const { packagesInStoreData, isValidating } = useFetchAllPackages();
+    const { packagesInStoreData, isValidating } = useFetchAllPackages(); 
     const [selectedPackage, setSelectedPackage] = React.useState<string>('');
     const [selectedPackageError, setSelectedPackageError] = React.useState<string>('');
     const [isLoading, setIsLoading] = React.useState<boolean>(false);
@@ -94,14 +94,6 @@ const PackageUpgradeModule = () => {
                                 <p>{ formatToCurrency(pkg?.inverstment, 'XAF') }</p>
                             </div>
                         </div>
-                        // <div
-                        //     key={pkg._id}
-                        //     onClick={() => handleSelectPackage(pkg._id)}
-                        //     className={`px-4 py-2 shadow-lg bg-white text-black font-semibold rounded-md ${ selectedPackage === pkg?._id ? "border-1 border-blue-500" : "border-0" } hover:bg-blue-500 hover:text-white transition duration-300 ease-in-out cursor-pointer`}
-                        // >
-                        //     <h4 className="text-md font-semibold">{pkg.name}</h4>
-                        //     <p>{ formatToCurrency(pkg?.inverstment, 'XAF') }</p>
-                        // </div>
                     ))}
                 </div>
                 {selectedPackageError && <p className="text-red-500 mt-2">{selectedPackageError}</p>}

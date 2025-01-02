@@ -238,7 +238,6 @@ export const useTaskStore = create<TaskState>((set, get) => {
     // Load all tasks
     setSelectedTaskFromBack: (filteredTasksFromBackend: any) =>
       set((state) => {
-        console.log(filteredTasksFromBackend, "in the store==============>")
         return {
           ...state,
           filteredTasksFromBackend,
@@ -281,21 +280,19 @@ export const useTaskStore = create<TaskState>((set, get) => {
           ? filteredTasksFromBackend
           : get().tasks_;
 
-      console.log(taskSource, "taskSource")
-
       if (!taskSource || taskSource.length === 0) {
-        console.warn("Task source is undefined or empty.");
+        console.log("Task source is undefined or empty.");
         return;
       }
 
       let taskIndex = taskSource.findIndex((task) => task?._id === id);
 
       if (taskIndex === -1) {
-        console.warn("Task not found in the first source. Trying fallback source");
+        console.log("Task not found in the first source. Trying fallback source");
         taskSource = get().tasks_;
         taskIndex = taskSource.findIndex((task) => task?._id === id);
         if (taskIndex === -1) {
-          console.warn("Task not found in the source.");
+          console.log("Task not found in the source.");
           return;
         }
       }
@@ -303,7 +300,7 @@ export const useTaskStore = create<TaskState>((set, get) => {
       const task = taskSource[taskIndex];
 
       if (!task) {
-        console.warn("Task is undefined.");
+        console.log("Task is undefined.");
         return;
       }
 

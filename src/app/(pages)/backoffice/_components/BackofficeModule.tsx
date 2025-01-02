@@ -26,6 +26,8 @@ import useFetchTaskAssigments from '@/hooks/useFetchTaskAssigment';
 import useFetchTasks from '@/hooks/useFetchTasks';
 import { useTaskStore } from '@/store/task-store';
 
+import PackagesListModule
+  from '../packages-display/_components/PackagesListModule';
 // import { useTaskStore } from '@/store/task-store';
 import AboutUs from './about-us/AboutUs';
 import { SkeletonSmallTask } from './SkeletonSmallTask';
@@ -84,7 +86,7 @@ const BackofficeModule = () => {
 
   return (
     <div>
-      <div className='w-full'>
+      <section className='w-full'>
         <Swiper
           modules={[Navigation, Pagination, Autoplay]}
           spaceBetween={0}
@@ -110,9 +112,9 @@ const BackofficeModule = () => {
             </SwiperSlide>
           ))}
         </Swiper>
-      </div>
+      </section>
 
-      <div>
+      <section>
         <div className='my-5'>
           <h1 className='text-primary text-[20px] font-bold'>Tâches pour aujourd'hui</h1>
         </div>
@@ -143,13 +145,16 @@ const BackofficeModule = () => {
               })
           }
         </div>
-      </div>
+      </section>
 
-      <div className="w-full max-w-2xl my-5 mx-auto">
+      <section className="w-full max-w-2xl my-5 mx-auto">
         <TestimonialList />
-      </div>
+      </section>
       <section>
         <AboutUs />
+      </section>
+      <section>
+        <PackagesListModule />
       </section>
     </div>
   );

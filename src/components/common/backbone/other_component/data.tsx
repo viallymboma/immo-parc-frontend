@@ -318,6 +318,24 @@ export type TransactionType = {
     __v: number;
 };
 
+export type PackageType = {
+    listOfTasks: string[];
+    _id: string;
+    name: string;
+    level: number;
+    inverstment: number;
+    numberOfTaskPerDay: number;
+    priceEarnedPerTaskDone: number;
+    priceEarnedForAllTaskDonePerDay: number;
+    priceEarnedForAllTaskDonePerMonth: number;
+    priceEarnedForAllTaskDonePerYear: number;
+    description: string;
+    createdAt: string; // ISO date string
+    updatedAt: string; // ISO date string
+    __v: number;
+};
+
+
 
 
 

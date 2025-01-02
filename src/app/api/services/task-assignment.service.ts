@@ -204,6 +204,9 @@ export class TaskAssignmentService {
     if (taskAssignment.status === 'in-progress') {
       return taskAssignment; // No need to update if already in progress
     }
+    if (taskAssignment.status === 'completed') {
+      throw new Error('Tâche terminée'); // No need to update if already in progress
+    }
     taskAssignment.status = 'in-progress';
     taskAssignment.startTime = `${new Date()}`; // Set the start time
     await taskAssignment.save();

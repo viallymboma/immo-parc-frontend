@@ -77,7 +77,7 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    const user = jwt.verify(token, JWT_SECRET);
+    const user = jwt.verify(token, JWT_SECRET!);
     return NextResponse.json({ message: 'Vous etes connecté', user });
   } catch (error) {
     return NextResponse.json({ error: "Session Terminée. Veillez vous connecter a nouveau s'il vous plait" }, { status: 401 });
@@ -93,7 +93,7 @@ export async function PATCH(request: Request) {
     }
 
     const token = authHeader.split(' ')[1];
-    const validToken = jwt.verify(token, JWT_SECRET);
+    const validToken = jwt.verify(token, JWT_SECRET!);
     return NextResponse.json({ valid: true, message: 'Session active. Bienvenu', user: validToken });
   } catch (error) {
     return NextResponse.json({ error: "Session Terminée. Veillez vous connecter a nouveau s'il vous plait" }, { status: 401 });

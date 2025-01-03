@@ -5,9 +5,10 @@ import {
 
 import { JwtService } from '@nestjs/jwt';
 
+import { JWT_SECRET } from '../../constants';
 import { TaskAssignmentService } from '../../services/task-assignment.service';
 
-const jwtService = new JwtService({ secret: 'your_jwt_secret' }); // Replace with your actual JWT secret
+const jwtService = new JwtService({ secret: JWT_SECRET }); // Replace with your actual JWT secret
 const taskAssignmentService = new TaskAssignmentService();
 
 

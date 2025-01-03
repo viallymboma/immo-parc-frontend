@@ -257,7 +257,7 @@ export class TaskAssignmentService {
 
     // Get priceEarnedPerTaskDone from the populated package
     const task: any = taskAssignment.task;
-    console.log(task, "task is here..........")
+    console.log(task, taskAssignment, task.packageId, "task is here..........")
     if (!task || !task.packageId) {
       console.log('Task or Package not found');
       throw new Error('Task or Package not found');

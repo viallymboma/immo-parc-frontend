@@ -22,6 +22,7 @@ export interface IUser extends Document {
     status?: 'active' | 'inactive';
     package?: Types.ObjectId | null;
     internshipExpiry?: Date;
+    rewardedUsers?: Types.ObjectId [] | null;
     userWallet?: Types.ObjectId | null;
     error?: string;
 }
@@ -54,6 +55,7 @@ const UserSchema = new Schema<IUser>(
         // Other fields remain the same
         userWallet: { type: Types.ObjectId, ref: 'Wallet', required: false },
         internshipExpiry: { type: Date },
+        rewardedUsers: { type: [Types.ObjectId], default: [], required: false }, // Track users who triggered rewards
     },
     {
         timestamps: true, // Add createdAt and updatedAt fields

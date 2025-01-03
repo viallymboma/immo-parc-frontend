@@ -1,3 +1,5 @@
+import { UserCheck2 } from 'lucide-react';
+
 import {
   CalendarSvgIcon,
   Dashboard2SvgIcon,
@@ -45,6 +47,14 @@ export const bottomNavElement: BottomElemenetType [] = [
     {
         id: 4,
         icon: (
+            <UserCheck2 color='#fff' />
+        ), 
+        tooltip: "Equipe", 
+        route: "/backoffice/teams/view"
+    }, 
+    {
+        id: 5,
+        icon: (
             <SettingSvgIcon />
         ), 
         tooltip: "Investir", 
@@ -55,7 +65,7 @@ export const bottomNavElement: BottomElemenetType [] = [
 const addElement = [
     ...bottomNavElement, 
     {
-        id: 5,
+        id: 6,
         icon: (
             <SettingSvgIcon />
         ), 
@@ -66,7 +76,7 @@ const addElement = [
 
 // Create bottomNavElementInAccount based on bottomNavElement with modified route for the fourth element
 export const bottomNavElementInAccount: BottomElemenetType[] = addElement.map((element) =>
-    element.id === 4
+    element.id === 5
         ? { ...element, route: "/backoffice/financial-accounts" }
         : element
 );

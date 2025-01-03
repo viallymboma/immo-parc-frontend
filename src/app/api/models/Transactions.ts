@@ -9,6 +9,7 @@ import {
 // Define the TypeScript interface for Transactions
 export interface ITransactions extends Document {
   user: Types.ObjectId; // Reference to User
+  triggeredBy?: Types.ObjectId;
   walletId: Types.ObjectId; 
   transactionId: string; 
   type: 'funding' | 'withdrawal' | 'earning' | 'investing'; // Type of transaction
@@ -24,7 +25,7 @@ const TransactionsSchema = new Schema<ITransactions>(
         transactionId: { type: String, required: false }, // Mobile Money transaction ID
         type: {
             type: String,
-            enum: ['funding', 'withdrawal', 'earning', 'investing'],
+            enum: ['funding', 'withdrawal', 'earning', 'investing', 'bonus'],
             required: true,
         },
         amount: { type: Number, required: true },
@@ -33,6 +34,7 @@ const TransactionsSchema = new Schema<ITransactions>(
             enum: ['pending', 'completed', 'rejected'],
             default: 'pending',
         },
+        triggeredBy: { type: Schema.Types.ObjectId, ref: 'User', required: false }, 
     },
     {
         timestamps: true, // Automatically manage createdAt and updatedAt fields

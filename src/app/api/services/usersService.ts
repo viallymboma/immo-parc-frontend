@@ -1,5 +1,6 @@
 // services/usersService.ts
 import bcrypt from 'bcryptjs';
+import { startSession } from 'mongoose';
 
 import { connectToDatabase } from '@/app/lib/mongodb';
 
@@ -171,54 +172,125 @@ export const usersService = {
 
   async upgradePackage(userId: string, packageId: string): Promise<IUser | any> {
 
-    await connectToDatabase();
+    const session = await startSession();
+    session.startTransaction();
 
-    const user = await User.findById(userId).populate(['parent', 'children', 'package', 'userWallet']) // .populate('userWallet').populate('package');
-    if (!user) throw new Error('Utilisateur introuvable');
+    try {
+      
+      await connectToDatabase();
+  
+      const user = await User.findById(userId).populate(['parent', 'children', 'package', 'userWallet']).session(session).exec(); // .populate('userWallet').populate('package');
+      if (!user) throw new Error('Utilisateur introuvable');
+  
+      const wallet = await Wallet.findById(user.userWallet?._id.toString()).session(session);
+      if (!wallet) throw new Error('Portefeuille utilisateur introuvable');
+  
+      const newPackage = await Packages.findById(packageId).session(session);
+      if (!newPackage) throw new Error('Package introuvable');
+  
+      // Check if the new package is a higher level
+      const currentPackage = user.package;
+      // console.log(currentPackage, currentPackage.package, newPackage, "////////////////")
+      if (currentPackage && currentPackage.level >= newPackage.level) {
+        throw new Error('Impossible de rétrograder ou de reactiver le même package');
+      }
+  
+      // return
+  
+      // Check if the wallet has sufficient funds
+      if (wallet.balance < newPackage?.inverstment) {
+        throw new Error('Solde du portefeuille insuffisant pour la mise à niveau du package');
+      }
+  
+      // Deduct the inverstment amount from the wallet
+      wallet.balance -= newPackage.inverstment;
+      await wallet.save({ session });
+  
+      console.log(wallet, "Deducted")
+  
+      // Update user's package
+      user.package = newPackage._id?.toString();
+      await user.save({ session });
+  
+      console.log(user, "Update user's package")
+  
+      // Create a transaction record
+      const transaction = new Transactions({
+        user: user._id?.toString(),
+        walletId: wallet._id?.toString(),
+        transactionId: `INVEST_${Date.now()}`, // Example transaction ID format
+        type: 'investing',
+        amount: newPackage.inverstment,
+        status: 'completed',
+      });
+      await transaction.save({ session }); 
+  
+      // Bonus system
+      const bonuses = [
+        { generation: 'parent', percentage: 25 },
+        { generation: 'grandparent', percentage: 3 },
+        { generation: 'greatGrandparent', percentage: 1 },
+      ];
+  
+      let currentParent = user.parent;
 
-    const wallet = await Wallet.findById(user.userWallet?._id.toString());
-    if (!wallet) throw new Error('Portefeuille utilisateur introuvable');
+      console.log(currentParent, "currentParent"); 
+  
+      for (const { generation, percentage } of bonuses) {
+        if (!currentParent) {
+          console.log(`${generation} introuvable pour l'utilisateur: ${user._id}`); 
+          break
+        };
+  
+        const parent = await User.findById(currentParent).session(session); 
+        console.log(parent, "parent========>")
+        if (!parent) break;
+  
+        console.log(parent.rewardedUsers, "parent.rewardedUsers")
+        if (!parent.rewardedUsers.includes(user._id)) {
+            // Calculate bonus
+            const bonusAmount = (newPackage.inverstment * percentage) / 100;
+  
+            // Update parent's wallet
+            const parentWallet = await Wallet.findById(parent.userWallet).session(session);
+            if (parentWallet) {
+              parentWallet.balance += bonusAmount;
+              await parentWallet.save({ session }); 
+  
+              // Create a bonus transaction
+              const bonusTransaction = new Transactions({
+                user: parent._id?.toString(),
+                walletId: parentWallet._id?.toString(),
+                transactionId: `BONUS_${Date.now()}`, // Example transaction ID format
+                type: 'bonus', 
+                amount: bonusAmount,
+                status: 'completed',
+                triggeredBy: user._id?.toString(), // Track who triggered this bonus
+              });
+              await bonusTransaction.save({ session });
+            }
+  
+            // Track reward
+            parent.rewardedUsers.push(user._id);
+            await parent.save({ session });
+        }
+  
+        // Move to the next parent
+        currentParent = parent.parent;
+      }
 
-    const newPackage = await Packages.findById(packageId);
-    if (!newPackage) throw new Error('Package introuvable');
-
-    // Check if the new package is a higher level
-    const currentPackage = user.package;
-    // console.log(currentPackage, currentPackage.package, newPackage, "////////////////")
-    if (currentPackage && currentPackage.level >= newPackage.level) {
-      throw new Error('Impossible de rétrograder ou de reactiver le même package');
+      // Commit the transaction
+      await session.commitTransaction();
+      session.endSession();
+  
+      return user;
+    } catch (error) {
+      console.log(error, "db transaction failed")
+      // Abort the transaction if any error occurs
+      await session.abortTransaction();
+      session.endSession();
+      throw error; // Re-throw the error for handling upstream
     }
 
-    // return
-
-    // Check if the wallet has sufficient funds
-    if (wallet.balance < newPackage?.inverstment) {
-      throw new Error('Solde du portefeuille insuffisant pour la mise à niveau du package');
-    }
-
-    // Deduct the inverstment amount from the wallet
-    wallet.balance -= newPackage.inverstment;
-    await wallet.save();
-
-    console.log(wallet, "Deducted")
-
-    // Update user's package
-    user.package = newPackage._id?.toString();
-    await user.save();
-
-    console.log(user, "Update user's package")
-
-    // Create a transaction record
-    const transaction = new Transactions({
-      user: user._id?.toString(),
-      walletId: wallet._id?.toString(),
-      transactionId: `INVEST_${Date.now()}`, // Example transaction ID format
-      type: 'investing',
-      amount: newPackage.inverstment,
-      status: 'completed',
-    });
-    await transaction.save();
-
-    return user;
   },
 };

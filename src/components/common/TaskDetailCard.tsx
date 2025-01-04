@@ -228,6 +228,7 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                     <div className="flex items-center justify-between text-sm text-gray-500">
                         <span>Audit :</span>
                         <Button 
+                            className={`p-0 h-auto ${ task?.status === "pending" ? "text-blue-600 hover:text-blue-700" : task?.status === "in-progress" ? "text-red-500 hover:text-red-600" : "text-slate-500 hover:text-slate-600" } `}
                             onClick={async () => {
                                 if (task?.taskLink) {
                                     if (task?.status === "completed") {
@@ -269,10 +270,13 @@ const TaskDetailCard: React.FC<TaskDetailCardProps> = ({ task }) => {
                                     toast.success("Statut de la tâche mis à jour comme étant en cours")
                                 }
                             }}
-                            variant="link" className="p-0 h-auto text-blue-600 hover:text-blue-700"
+                            variant="link" 
                         >
                             <ExternalLink className="w-4 h-4 mr-1" />
-                            Ouvrir le lien
+                            {
+                                task?.status === "pending" ? "Ouvrir le lien" : task?.status === "in-progress" ? "Lien ouvert" : "..."
+                            }
+                            
                         </Button>
                     </div>
 

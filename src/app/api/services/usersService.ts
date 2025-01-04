@@ -292,5 +292,109 @@ export const usersService = {
       throw error; // Re-throw the error for handling upstream
     }
 
-  },
+  }, 
+
+  // // WITHOUT SESSION TRANSACTION
+  // async upgradePackage(userId: string, packageId: string): Promise<IUser | any> {
+
+  //   await connectToDatabase();
+
+  //   const user = await User.findById(userId).populate(['parent', 'children', 'package', 'userWallet']).exec(); // .populate('userWallet').populate('package');
+  //   if (!user) throw new Error('Utilisateur introuvable');
+
+  //   const wallet = await Wallet.findById(user.userWallet?._id.toString());
+  //   if (!wallet) throw new Error('Portefeuille utilisateur introuvable');
+
+  //   const newPackage = await Packages.findById(packageId);
+  //   if (!newPackage) throw new Error('Package introuvable');
+
+  //   // Check if the new package is a higher level
+  //   const currentPackage = user.package;
+  //   // console.log(currentPackage, currentPackage.package, newPackage, "////////////////")
+  //   if (currentPackage && currentPackage.level >= newPackage.level) {
+  //     throw new Error('Impossible de rétrograder ou de reactiver le même package');
+  //   }
+
+  //   // return
+
+  //   // Check if the wallet has sufficient funds
+  //   if (wallet.balance < newPackage?.inverstment) {
+  //     throw new Error('Solde du portefeuille insuffisant pour la mise à niveau du package');
+  //   }
+
+  //   // Deduct the inverstment amount from the wallet
+  //   wallet.balance -= newPackage.inverstment;
+  //   await wallet.save();
+
+  //   console.log(wallet, "Deducted")
+
+  //   // Update user's package
+  //   user.package = newPackage._id?.toString();
+  //   await user.save();
+
+  //   console.log(user, "Update user's package")
+
+  //   // Create a transaction record
+  //   const transaction = new Transactions({
+  //     user: user._id?.toString(),
+  //     walletId: wallet._id?.toString(),
+  //     transactionId: `INVEST_${Date.now()}`, // Example transaction ID format
+  //     type: 'investing',
+  //     amount: newPackage.inverstment,
+  //     status: 'completed',
+  //   });
+  //   await transaction.save(); 
+
+  //   // Bonus system
+  //   const bonuses = [
+  //     { generation: 'parent', percentage: 25 },
+  //     { generation: 'grandparent', percentage: 3 },
+  //     { generation: 'greatGrandparent', percentage: 1 },
+  //   ];
+
+  //   let currentParent = user.parent;
+
+  //   for (const { generation, percentage } of bonuses) {
+  //     if (!currentParent) {
+  //       console.log(`${generation} introuvable pour l'utilisateur: ${user._id}`); 
+  //       break
+  //     };
+
+  //     const parent = await User.findById(currentParent);
+  //     if (!parent) break;
+
+  //     if (!parent.rewardedUsers.includes(user._id)) {
+  //         // Calculate bonus
+  //         const bonusAmount = (newPackage.inverstment * percentage) / 100;
+
+  //         // Update parent's wallet
+  //         const parentWallet = await Wallet.findById(parent.userWallet);
+  //         if (parentWallet) {
+  //           parentWallet.balance += bonusAmount;
+  //           await parentWallet.save(); 
+
+  //           // Create a bonus transaction
+  //           const bonusTransaction = new Transactions({
+  //             user: parent._id?.toString(),
+  //             walletId: parentWallet._id?.toString(),
+  //             transactionId: `BONUS_${Date.now()}`, // Example transaction ID format
+  //             type: 'bonus',
+  //             amount: bonusAmount,
+  //             status: 'completed',
+  //             triggeredBy: user._id?.toString(), // Track who triggered this bonus
+  //           });
+  //           await bonusTransaction.save();
+  //         }
+
+  //         // Track reward
+  //         parent.rewardedUsers.push(user._id);
+  //         await parent.save();
+  //     }
+
+  //     // Move to the next parent
+  //     currentParent = parent.parent;
+  //   }
+
+  //   return user;
+  // },
 };

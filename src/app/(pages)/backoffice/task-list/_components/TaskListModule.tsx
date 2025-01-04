@@ -32,10 +32,11 @@ const TaskListModule = () => {
     const counts = filteredTasksFromBackend?.reduce(
         (acc, task) => {
             if (task.status === "completed") acc.completed++;
-            if (task.status === "pending" || task.status === "in-progress") acc.pending++;
+            if (task.status === "in-progress") acc.ongoing++;
+            if (task.status === "pending") acc.pending++;
             return acc;
         },
-        { completed: 0, pending: 0 }
+        { completed: 0, pending: 0, ongoing: 0 }
     );
 
     return (
@@ -49,9 +50,16 @@ const TaskListModule = () => {
                 {/* <Separator /> */}
                 <div className='h-10 w-[1px] bg-black'></div>
                 <div className='flex flex-col text-center '>
+                    <span>{ counts?.ongoing }</span>
+                    <h1 className='text-[12px]'>Tâches en cour aujourd'hui</h1>
+                </div>
+                {/* <Separator /> */}
+                <div className='h-10 w-[1px] bg-black'></div>
+                <div className='flex flex-col text-center '>
                     <span>{ counts?.completed }</span>
                     <h1 className='text-[12px]'>Tâches termnées aujourd'hui</h1>
                 </div>
+                
             </div>
 
             <NavigationContent 

@@ -12,7 +12,7 @@ export interface ITransactions extends Document {
   triggeredBy?: Types.ObjectId;
   walletId: Types.ObjectId; 
   transactionId: string; 
-  type: 'funding' | 'withdrawal' | 'earning' | 'investing'; // Type of transaction
+  type: 'funding' | 'withdrawal' | 'earning' | 'investing' | 'bonus'; // Type of transaction
   amount: number; // Transaction amount
   status: 'pending' | 'completed' | 'rejected'; // Status of the transaction
 }

@@ -6,6 +6,7 @@ import {
   TaskDataType,
   tasks,
   TransactionType,
+  UserProspectType,
 } from '@/components/common/backbone/other_component/data';
 // import { useUserInfo } from '@/hooks/useUserInfo';
 import { BASE_API_URL } from '@/lib/constants';
@@ -36,6 +37,7 @@ interface TaskState {
   allFundingTransactionsInStore: TransactionType [], 
   allWithdrawalTransactionsInStore: TransactionType [], 
   allInvestmentTransactionsInStore: TransactionType [], 
+  loggedInUserFamilyTreeInStore: UserProspectType, 
   setEarningTransactionsInStore: (allEarningTransactionsInStore: any []) => void; 
   setFundingTransactionsInStore: (allFundingTransactionsInStore: any []) => void; 
   setWithdrawalTransactionsInStore: (allWithdrawalTransactionsInStore: any []) => void; 
@@ -52,6 +54,7 @@ interface TaskState {
   setTotalEarningsInStore: (totalEarningsInStore: number) => void; 
   setTotalInvestmentInStore: (totalInvestmentInStore: number) => void; 
   setPackagesInStore: (packagesInStore: TransactionType []) => void; 
+  setLoggedInUserFamilyTreeInStore: (loggedInUserFamilyTreeInStore: UserProspectType) => void; 
   
   setAllSelectedTaskFromBack: ({ 
     allSelecTasksForUsers, 
@@ -98,11 +101,21 @@ export const useTaskStore = create<TaskState>((set, get) => {
     allWithdrawalTransactionsInStore: get()?.allWithdrawalTransactionsInStore || [], 
     allInvestmentTransactionsInStore: get()?.allInvestmentTransactionsInStore || [], 
 
+    loggedInUserFamilyTreeInStore: get()?.loggedInUserFamilyTreeInStore || [], 
+
     setEarningTransactionsInStore: (allEarningTransactionsInStore: TransactionType []) =>
       set((state) => {
         return {
           ...state,
           allEarningTransactionsInStore, 
+        };
+      }), 
+
+    setLoggedInUserFamilyTreeInStore: (loggedInUserFamilyTreeInStore: UserProspectType) =>
+      set((state) => {
+        return {
+          ...state,
+          loggedInUserFamilyTreeInStore, 
         };
       }),
     

@@ -1,12 +1,15 @@
 "use client";
 import React from 'react';
 
+import { useRouter } from 'next/navigation';
 import useSWR from 'swr';
 
 import Breadcrumb from '@/components/Breadcrumbs/Breadcrumb';
 import ReturnHeader from '@/components/common/backbone/ReturnHeader';
 import UserTable from '@/components/Tables/AllTables/UserTable';
+import { Button } from '@/components/ui/button';
 import { BASE_API_URL } from '@/lib/constants';
+import { useTaskStore } from '@/store/task-store';
 
 // SWR fetcher function
 const fetcher = (url: string) =>
@@ -23,9 +26,15 @@ const fetcher = (url: string) =>
     });
 
 const TeamsViewModule = ({ userId }: { userId: string }) => {
+    const { setLoggedInUserFamilyTreeInStore } = useTaskStore(); 
+    const router = useRouter ()
     const { data, error, isLoading } = useSWR(
         `${BASE_API_URL}/users/${userId}/children`,
-        fetcher
+        fetcher, {
+            onSuccess: (data) => {
+                setLoggedInUserFamilyTreeInStore (data)
+            },
+        }
     );
     
     if (isLoading) {
@@ -59,6 +68,11 @@ const TeamsViewModule = ({ userId }: { userId: string }) => {
             />
             <div>
                 {/* users={data} */}
+                <Button variant={"link"} onClick={() => {
+                    router.push("/backoffice/teams/tree-view")
+                }}>
+                    Autre vues
+                </Button>
                 <UserTable  />
             </div>
         </div>

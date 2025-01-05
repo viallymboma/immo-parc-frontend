@@ -30,7 +30,7 @@ const MyAcountModule = () => {
     const { walletBalance } = useTaskStore(); 
 
     return (
-        <div className='flex flex-col gap-3'>
+        <div className='flex flex-col gap-3 mb-[5rem]'>
             
             <div className='flex px-4 py-6 bg-gradient-to-r from-yellow-300 via-yellow-500 to-yellow-700 flex-row shadow-5 rounded-3xl'>
                 <div className='flex justify-center rounded-3xl overflow-hidden w-[50px]'>
@@ -42,7 +42,7 @@ const MyAcountModule = () => {
                     <div className='text-[20px] font-bold'>  { isValidating ? <LoadingSpinner /> : formatToCurrency(walletBalance!, 'XAF') } </div>
                 </div>
             </div>
-            <div className='flex flex-col gap-3 '>
+            <div className='flex flex-col gap-3'>
                 {
                     bottomNavElementInAccount?.map((element: BottomElemenetType, index: number) => {
                         return (

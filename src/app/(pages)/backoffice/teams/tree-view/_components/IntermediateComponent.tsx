@@ -2,20 +2,67 @@
 
 import React, { useState } from 'react';
 
+import { useRouter } from 'next/navigation';
+
+import Breadcrumb from '@/components/Breadcrumbs/Breadcrumb';
+import ReturnHeader from '@/components/common/backbone/ReturnHeader';
 import {
   Dashboard2SvgIcon,
   NewHamburgerSvgIcon,
 } from '@/components/svgs/SvgIcons';
+import useFetchAllGenerations from '@/hooks/useFetchAllGenerations';
+import { useTaskStore } from '@/store/task-store';
 
 import FolderViewComponent from './FolderViewComponent';
 import TreeViewComponent from './TreeViewComponent';
 
-const IntermediateComponent = () => {
+// SWR fetcher function
+const fetcher = (url: string) =>
+    fetch(url, {
+        method: 'GET',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+    }).then((res) => {
+        if (!res.ok) {
+            throw new Error('Failed to fetch data');
+        }
+        return res.json();
+    });
+
+const IntermediateComponent = ({ userId }: { userId: string }) => {
+
     const [ displayView, setDisplayView ] = useState <boolean> (false); 
     const [ colorHiglight, setColorHiglight ] = useState <string> ("#fff"); 
     const [ colorHiglight2, setColorHiglight2 ] = useState <string> ("#000"); 
     const [showScrollTop, setShowScrollTop] = useState(false); 
-    const containerRef = React.useRef<HTMLDivElement>(null);
+    const containerRef = React.useRef<HTMLDivElement>(null); 
+
+    const { loggedInUserFamilyTreeData, isValidating, error } = useFetchAllGenerations (); 
+    const { loggedInUserFamilyTreeInStore } = useTaskStore(); 
+
+
+    const router = useRouter (); 
+    
+    if (isValidating) {
+        return <p>Loading team data...</p>;
+    }
+    
+    if (error) {
+        return (
+            <div className="mx-auto max-w-7xl">
+                <Breadcrumb pageName="Visuel de mon equipe" />
+                <ReturnHeader
+                    headerName="Mon equipe"
+                    returnBtnLabel="Retour"
+                    returnLink="/backoffice"
+                />
+                <div>
+                    <p>Error fetching team data: {error.message}</p>
+                </div>
+            </div>
+        );
+    }
 
     // Scroll to top function
     const scrollToTop = () => {
@@ -65,9 +112,9 @@ const IntermediateComponent = () => {
             <div className='mb-[5rem]'>
                 {
                     displayView ? 
-                        <FolderViewComponent />
+                        <FolderViewComponent loggedInUserFamilyTreeInStore={ loggedInUserFamilyTreeInStore } />
                         :
-                        <TreeViewComponent />
+                        <TreeViewComponent loggedInUserFamilyTreeInStore={ loggedInUserFamilyTreeInStore } />
                 }
             </div>
             {/* Scroll to Top Button  */}

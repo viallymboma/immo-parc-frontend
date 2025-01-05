@@ -9,42 +9,19 @@ import Package from '../models/Package';
 
 // Utility to validate credentials and generate a token
 export const validateUser = async (phone: string, password: string) => {
-  const user = await User.findOne({ phone }).populate(['parent', 'package', 'userWallet', 'children',
-    // {
-    //   path: 'children', 
-    //   model: 'User',
-    //   populate: ['parent', 'package', 'userWallet',
-    //     {
-    //       path: 'children', 
-    //       model: 'User', 
-    //       populate: ['parent', 'package', 'userWallet',
-    //         {
-    //           path: 'children', 
-    //           model: 'User', 
-    //           populate: ['parent', 'package', 'userWallet',
-    //             {
-    //               path: 'children', 
-    //               model: 'User', 
-    //               populate: ['parent', 'package', 'userWallet', 'children']
-    //             }
-    //           ]
-    //         }
-    //       ]
-    //     }
-    //   ]
-    // }
-  ]);
-  console.log(user, "iiiiiiiiiiiiiiiiiiiiiiiiii")
-
+  const user = await User.findOne({ phone }).populate(['parent', 'package', 'userWallet']);
+  
   if (!user) {
+    console.log(user, "User with the given phone number does not exist"); 
     // User with the given phone number does not exist
     throw new Error('Numero introuvable dans le system.');
   }
 
   const isPasswordValid = await bcrypt.compare(password, user.password);
   if (!isPasswordValid) {
+    console.log(user, "Incorrect password"); 
     // Password is incorrect
-    throw new Error('Incorrect password.');
+    throw new Error('Mauvais mot de passe.');
   }
   return user;
 };
@@ -142,10 +119,11 @@ export const getChildrenUpToThirdGeneration = async (userId: string) => {
             },
           ],
         },
-      ]);
+      ]).populate(['package', 'parent', 'userWallet']);
 
     if (!userWithChildren) {
-      throw new Error('User not found');
+      console.log("User not found"); 
+      throw new Error('Utilisateur introuvable');
     }
 
     return userWithChildren;

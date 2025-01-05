@@ -7,7 +7,6 @@ import { useRouter } from 'next/navigation';
 import { useUserInfo } from '@/hooks/useUserInfo';
 import { useTaskStore } from '@/store/task-store';
 
-// import { useTaskStore } from '@/store/task-store';
 import { TaskDataType } from './backbone/other_component/data';
 
 type TaskCardType = {
@@ -41,7 +40,6 @@ const TaskCardStyled: React.FC<TaskCardType> = ({ task, onRefresh }) => {
 
           <div className=''
             onClick={ () => {
-              // selectTask (task?._id as string); 
               router?.push(`/backoffice/task-list/${ task?._id }`)
             }}
           >
@@ -61,7 +59,6 @@ const TaskCardStyled: React.FC<TaskCardType> = ({ task, onRefresh }) => {
                 hidden
                 checked={task?.isSelected} // Reflect the isSelected state
                 onChange={async () => {
-                  // toggleTaskSelection(task?._id as string, numberOfTaskPerDay); // Toggle selection on change
                   await toggleTaskSelectionV2(task?._id as string, numberOfTaskPerDay, user?.userInfo?._id) // Toggle selection on change
                   onRefresh(); // Trigger refresh after toggling
                   console.log("Toggled task ID:", task?._id); // Debugging log
@@ -99,38 +96,3 @@ export default React.memo(TaskCardStyled);
 
 
 
-
-
-
-
-
-
-
-// import React from 'react';
-
-// import { useRouter } from 'next/navigation';
-
-// const TaskCard = ({ task }: any) => {
-//     const router = useRouter();
-
-//     // Handler for navigation to task details
-//     const handleViewDetails = () => {
-//         router.push(`/task-list/${task.id}`);
-//     };
-
-//     return (
-//         <>
-//             <h2 className="text-xl font-bold mb-2">{task.name}</h2>
-//             <p className="text-gray-700 mb-4">{task.description}</p>
-//             <p className="text-lg font-semibold mb-4">Reward: {task.reward} XAF</p>
-//             <button
-//                 onClick={handleViewDetails}
-//                 className="bg-blue-500 text-white px-4 py-2 rounded-full hover:bg-blue-600 transition duration-300 ease-in-out"
-//             >
-//                 View Details
-//             </button>
-//         </>
-//     );
-// };
-
-// export default TaskCard;

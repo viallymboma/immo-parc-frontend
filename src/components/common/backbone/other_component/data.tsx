@@ -280,6 +280,32 @@ export const tasks: TaskDataType [] = [
     }, 
 ]
 
+export type UserProspectType = {
+    _id: number | string;
+    id?: number;
+    position?: string;
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    phone: string;
+    password: string;
+    parent?: UserProspectType; // Parent can either be a nested object or just an ID
+    children: UserProspectType []; // Recursive structure
+    funds?: number;
+    selectedTasksCount?: number;
+    accountType: string;
+    role: string;
+    status: string;
+    package?: PackageType; // Can be an object or just an ID
+    internshipExpiry?: string; // ISO date string
+    createdAt?: string; // ISO date string
+    updatedAt?: string; // ISO date string
+    __v?: number;
+    userWallet?: WalletTypeForTransaction; // Can be an object or just an ID
+    rewardedUsers?: string[]; // Array of user IDs
+};
+
 export type UserTypeForTransaction = {
     _id: string;
     username: string;
@@ -287,7 +313,6 @@ export type UserTypeForTransaction = {
     firstName: string;
     lastName: string;
     phone: string;
-    password: string;
     parent: string;
     children: string[];
     funds: number;
@@ -295,7 +320,7 @@ export type UserTypeForTransaction = {
     accountType: string;
     role: string;
     status: string;
-    package: string;
+    package?: string;
     internshipExpiry: string; // ISO date string
     createdAt: string; // ISO date string
     updatedAt: string; // ISO date string

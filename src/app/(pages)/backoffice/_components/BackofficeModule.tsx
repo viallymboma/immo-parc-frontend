@@ -28,7 +28,6 @@ import { useTaskStore } from '@/store/task-store';
 
 import PackagesListModule
   from '../packages-display/_components/PackagesListModule';
-// import { useTaskStore } from '@/store/task-store';
 import AboutUs from './about-us/AboutUs';
 import { SkeletonSmallTask } from './SkeletonSmallTask';
 import TestimonialList from './testimonials/TestimonialList';
@@ -48,8 +47,6 @@ const BackofficeModule = () => {
   const { taskAssignment, refetchTaskAssignments } = useFetchTaskAssigments (); 
 
   const { tasks_, filteredTasksFromBackend } = useTaskStore(); 
-
-  
 
   function replaceById(arr1: any, arr2: any) {
     // Create a map of objects from arr2, indexed by _id
@@ -74,8 +71,6 @@ const BackofficeModule = () => {
       console.error("Error refreshing data:", error);
     }
   }, []);
-
-  // const intermediateObjects = replaceById(tasks_, filteredTasksFromBackend);
 
   const intermediateObjects = React.useMemo(
     () => replaceById(tasks_, filteredTasksFromBackend),

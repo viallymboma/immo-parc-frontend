@@ -6,10 +6,11 @@ import useSWR from 'swr';
 
 import Breadcrumb from '@/components/Breadcrumbs/Breadcrumb';
 import ReturnHeader from '@/components/common/backbone/ReturnHeader';
-import UserTable from '@/components/Tables/AllTables/UserTable';
-import { Button } from '@/components/ui/button';
 import { BASE_API_URL } from '@/lib/constants';
 import { useTaskStore } from '@/store/task-store';
+
+import IntermediateComponent
+  from '../../tree-view/_components/IntermediateComponent';
 
 // SWR fetcher function
 const fetcher = (url: string) =>
@@ -68,12 +69,15 @@ const TeamsViewModule = ({ userId }: { userId: string }) => {
             />
             <div>
                 {/* users={data} */}
-                <Button variant={"link"} onClick={() => {
+                {/* <Button variant={"link"} onClick={() => {
                     router.push("/backoffice/teams/tree-view")
                 }}>
                     Autre vues
-                </Button>
-                <UserTable  />
+                </Button> */}
+                <IntermediateComponent userId={ userId } />
+                <div>
+                </div>
+                {/* <UserTable  /> */}
             </div>
         </div>
     );

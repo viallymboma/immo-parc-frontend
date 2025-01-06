@@ -1,5 +1,4 @@
 "use client";
-"use client";
 import React from 'react';
 
 import Image from 'next/image';
@@ -80,7 +79,7 @@ const PackageUpgradeModule = () => {
                             <SkeletonSmallTask />
                             <SkeletonSmallTask />
                         </div>
-                    ) : packagesInStore.filter((rem: any) => rem?.level !== 0 )?.map((pkg: any) => (
+                    ) : [...packagesInStore].sort((a, b) => a.level - b.level).filter((rem: any) => rem?.level !== 0 )?.map((pkg: any) => (
                         <div 
                             key={pkg._id}
                             onClick={() => handleSelectPackage(pkg._id)}

@@ -54,9 +54,10 @@ export const usersService = {
       if (!pkg) throw new Error('No packages available');
     }
 
-    const parentCheck = await User.findOne({ phone: parentId }).populate(['parent', 'children', 'package', 'userWallet']) // .populate('userWallet').populate('package');
+    // UNCOMMENT IF YOU WANT TO PREVENT USER FROM REGISTERING FROM A PERSON WHO HAS PURCHASE NO HIGHER PACKAGE
+    // const parentCheck = await User.findOne({ phone: parentId }).populate(['parent', 'children', 'package', 'userWallet']) // .populate('userWallet').populate('package');
 
-    if (parentCheck.package.level === 0) throw new Error("Votre parrain ne peut pas vous inviter s'il n'est pas passé au niveau Agent Echo level 1");
+    // if (parentCheck.package.level === 0) throw new Error("Votre parrain ne peut pas vous inviter s'il n'est pas passé au niveau Agent Echo level 1");
 
     const hashedPassword = await bcrypt.hash(password, 10);
 

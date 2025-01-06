@@ -27,7 +27,7 @@ const PackagesListModule = () => {
                     <SkeletonSmallTask />
                     <SkeletonSmallTask />
                 </div>
-            ) : packagesInStore.map((pkg: PackageType) => (
+            ) : [...packagesInStore].sort((a, b) => a.level - b.level).filter((rem: any) => rem?.level !== 0 )?.map((pkg: PackageType) => (
                 <div
                     key={pkg._id}
                     className="bg-yellow-400 text-black rounded-lg shadow-lg hover:scale-105 transition-transform duration-300"

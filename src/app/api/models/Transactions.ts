@@ -15,6 +15,7 @@ export interface ITransactions extends Document {
   type: 'funding' | 'withdrawal' | 'earning' | 'investing' | 'bonus'; // Type of transaction
   amount: number; // Transaction amount
   status: 'pending' | 'completed' | 'rejected'; // Status of the transaction
+  withdrawalId?: Types.ObjectId;
 }
 
 // Define the Mongoose schema for Transactions
@@ -35,6 +36,7 @@ const TransactionsSchema = new Schema<ITransactions>(
             default: 'pending',
         },
         triggeredBy: { type: Schema.Types.ObjectId, ref: 'User', required: false }, 
+        withdrawalId: { type: Schema.Types.ObjectId, ref: 'Withdrawal', required: false }, 
     },
     {
         timestamps: true, // Automatically manage createdAt and updatedAt fields

@@ -10,8 +10,8 @@ const AddWithdrawalModule = () => {
     <div>
         <ReturnHeader 
             headerName='Mes Retraits'
-            returnBtnLabel='Retour'
-            returnLink='/backoffice/transactions/withdrawals'
+            returnBtnLabel='Changer type de retrait'
+            returnLink='/backoffice/wallet/withdraw/select'
         />
         <div>
           <WithdrawForm />

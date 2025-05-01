@@ -62,6 +62,9 @@ export class TransactionService {
         }).populate({
             path: "walletId", 
             model: "Wallet"
+        }).populate({
+            path: "withdrawalId", 
+            model: "Withdrawal"
         });
     }
 

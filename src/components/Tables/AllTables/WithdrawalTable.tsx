@@ -299,7 +299,7 @@ const WithdrawalTable: React.FC <TableRechargeType> = ({ allWithdrawalTransactio
               </DropdownMenu>
             </Dropdown>
             <Link
-              href={"/backoffice/transactions/withdrawals/add"}
+              href={"/backoffice/wallet/withdraw/select"}
 
               // onClick={() => {
               //   router.push("/backoffice/financial-accounts")

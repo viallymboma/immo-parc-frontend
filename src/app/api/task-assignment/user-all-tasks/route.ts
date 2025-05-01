@@ -30,8 +30,6 @@ export async function GET(req: NextRequest) {
         // Filter tasks with `status: completed`
         const completedTasks = tasks.filter((task) => task.status === 'completed');
 
-        console.log(completedTasks, "ttttttttttttyyyyyyyyy")
-
         // Get today's date range
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
